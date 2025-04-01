@@ -2,15 +2,15 @@ import React, { useRef, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faEnvelope,
     faPhone,
     faMapMarkerAlt,
     faPaperPlane,
     faUser,
-    faComment
-} from '@fortawesome/free-solid-svg-icons';
+    faComment,
+} from "@fortawesome/free-solid-svg-icons";
 import "../styles/ContactUs.css";
 
 const ContactUs = () => {
@@ -47,10 +47,10 @@ const ContactUs = () => {
 
         emailjs
             .sendForm(
-                process.env.REACT_APP_EMAILJS_SERVICE_ID,
-                process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+                import.meta.env.VITE_EMAILJS_SERVICE_ID, // Updated to use Vite environment variables
+                import.meta.env.VITE_EMAILJS_TEMPLATE_ID, // Updated to use Vite environment variables
                 form.current,
-                process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+                import.meta.env.VITE_EMAILJS_PUBLIC_KEY // Updated to use Vite environment variables
             )
             .then(
                 (result) => {
