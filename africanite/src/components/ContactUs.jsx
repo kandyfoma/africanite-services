@@ -95,15 +95,15 @@ const ContactUs = () => {
                                 <div className="contact-info mb-4">
                                     <div className="info-item">
                                         <FontAwesomeIcon icon={faEnvelope} className="info-icon" />
-                                        <p>contact@africaniteservices.com</p>
+                                        <p>info@africaniteservices.com</p>
                                     </div>
                                     <div className="info-item">
                                         <FontAwesomeIcon icon={faPhone} className="info-icon" />
-                                        <p>+33 1 23 45 67 89</p>
+                                        <p>+243 851 054 526</p>
                                     </div>
                                     <div className="info-item">
                                         <FontAwesomeIcon icon={faMapMarkerAlt} className="info-icon" />
-                                        <p>Paris, France</p>
+                                        <p>18 Av. Usoke, C/Kampemba, Haut Katanga, Lubumbashi, Republique Democratic Du Congo</p>
                                     </div>
                                 </div>
                             </motion.div>

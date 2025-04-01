@@ -20,6 +20,12 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.info-icon {
+    font-size: 1rem;
+    margin-right: 1rem;
+    /* Space between icon and text */
+}
+
 .contact-hero p {
     font-size: 1.2rem;
     line-height: 1.6;
