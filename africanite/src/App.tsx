@@ -8,7 +8,8 @@ import Footer from "./components/Footer";
 
 const App: React.FC = () => {
     return (
-        <Router>
+        // Add the basename to handle GitHub Pages subdirectory
+        <Router basename="/africanite-services">
             <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
                 {/* Navbar */}
                 <Navbar />

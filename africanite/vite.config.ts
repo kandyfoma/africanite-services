@@ -1,15 +1,23 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/africanite-services/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  },
   resolve: {
     alias: {
-      '@styles': path.resolve(__dirname, './src/styles'), // Alias for styles directory
-      '@components': path.resolve(__dirname, './src/components'), // Alias for components directory (optional)
+      '@styles': path.resolve(__dirname, './src/styles'),
+      '@components': path.resolve(__dirname, './src/components'),
     },
   },
-  base: '/africanite-services/', // Replace 'africanite-services' with your repository name
-});
+})
