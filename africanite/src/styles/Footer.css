@@ -1,23 +1,25 @@
 .footer {
-    background-color: #2c3e50;
-    /* Updated to match the primary color */
-    color: #ecf0f1;
-    /* Light text color for better contrast */
+    background-color: var(--text-light);
+    /* White background to match the navbar */
+    color: var(--primary-color);
+    /* Green text for better contrast */
     padding: 3rem 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for separation */
 }
 
 .footer h3 {
-    color: #e67e22;
-    /* Accent color for headings */
+    color: var(--primary-color);
+    /* Green for headings */
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
     text-align: center;
 }
 
 .footer p {
-    color: #bdc3c7;
-    /* Softer light gray for text */
+    color: var(--secondary-color);
+    /* Dark Green for text */
     font-size: 1rem;
     text-align: center;
     margin-bottom: 1.5rem;
@@ -33,14 +35,15 @@
 }
 
 .social-links li a {
-    color: #ecf0f1;
+    color: var(--primary-color);
+    /* Green for icons */
     font-size: 1.8rem;
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .social-links li a:hover {
-    color: #e67e22;
-    /* Accent color for hover effect */
+    color: var(--secondary-color);
+    /* Dark Green for hover effect */
     transform: scale(1.2);
 }
 
@@ -54,8 +57,8 @@
 }
 
 .footer-links li a {
-    color: #e67e22;
-    /* Accent color for links */
+    color: var(--primary-color);
+    /* Green for links */
     text-decoration: none;
     font-size: 1rem;
     font-weight: 600;
@@ -63,13 +66,13 @@
 }
 
 .footer-links li a:hover {
-    color: #f39c12;
-    /* Slightly brighter hover color */
+    color: var(--secondary-color);
+    /* Dark Green for hover effect */
 }
 
 hr {
-    border-color: #34495e;
-    /* Softer dark gray for the divider */
+    border-color: var(--secondary-color);
+    /* Dark Green for the divider */
     margin: 2rem 0;
 }
 

@@ -1,12 +1,22 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #e67e22;
-    --accent-color: #3498db;
-    --background-light: #f5f6fa;
-    --text-dark: #2c3e50;
-    --text-light: #ecf0f1;
+    --primary-color: #2a9d8f;
+    /* Green (Primary) */
+    --secondary-color: #264653;
+    /* Dark Green */
+    --accent-color: #e9c46a;
+    /* Yellow Accent */
+    --background-light: #f4f1de;
+    /* Light Neutral Background */
+    --text-dark: #264653;
+    /* Dark Text */
+    --text-light: #f4f1de;
+    /* Light Text */
+    --button-light: #3cbfae;
+    /* Lighter Green for Buttons */
+    --button-hover: #45d1c0;
+    /* Even Lighter Green for Hover */
     --shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -16,10 +26,7 @@
 }
 
 .hero {
-    background: linear-gradient(rgba(44, 62, 80, 0.85), rgba(52, 152, 219, 0.85)),
-        url('../assets/hero-bg.jpg');
-    background-size: cover;
-    background-position: center;
+    background: linear-gradient(rgba(42, 157, 143, 0.85), rgba(233, 196, 106, 0.85));
     min-height: 90vh;
     display: flex;
     align-items: center;
@@ -45,20 +52,28 @@
 }
 
 .hero .cta-button {
-    background-color: var(--secondary-color);
+    background-color: var(--button-light);
+    /* Lighter Green for Buttons */
     border: none;
     padding: 1rem 2.5rem;
     font-size: 1.1rem;
     font-weight: 600;
     text-transform: uppercase;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    color: var(--text-light);
+    border-radius: 5px;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .hero .cta-button:hover {
-    background-color: #d35400;
+    background-color: var(--button-hover);
+    /* Even Lighter Green for Hover */
     transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
-
+.services-grid {
+    row-gap: 2rem;
+}
 .services,
 .why-us {
     padding: 6rem 0;
@@ -102,6 +117,9 @@
     color: var(--primary-color);
     font-weight: 600;
     margin-bottom: 1rem;
+    font-size: 1.2rem; /* Adjusted font size for better fit */
+    word-wrap: break-word; /* Ensure long words break to the next line */
+    text-align: center;
 }
 
 .feature {
@@ -141,18 +159,24 @@
 }
 
 .cta-section .cta-button {
-    background-color: var(--secondary-color);
+    background-color: var(--button-light);
+    /* Lighter Green for Buttons */
     border: none;
     padding: 1rem 3rem;
     font-size: 1.2rem;
     font-weight: 600;
     text-transform: uppercase;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    color: var(--text-light);
+    border-radius: 5px;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .cta-section .cta-button:hover {
-    background-color: #d35400;
+    background-color: var(--button-hover);
+    /* Even Lighter Green for Hover */
     transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 768px) {
