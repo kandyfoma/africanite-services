@@ -1,0 +1,175 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #e67e22;
+    --accent-color: #3498db;
+    --background-light: #f5f6fa;
+    --text-dark: #2c3e50;
+    --text-light: #ecf0f1;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+.home {
+    overflow-x: hidden;
+    color: var(--text-dark);
+}
+
+.hero {
+    background: linear-gradient(rgba(44, 62, 80, 0.85), rgba(52, 152, 219, 0.85)),
+        url('../assets/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.hero-content {
+    padding: 3rem 0;
+}
+
+.hero h1 {
+    font-size: 3.8rem;
+    margin-bottom: 1.8rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero .cta-button {
+    background-color: var(--secondary-color);
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.hero .cta-button:hover {
+    background-color: #d35400;
+    transform: translateY(-2px);
+}
+
+.services,
+.why-us {
+    padding: 6rem 0;
+}
+
+.services {
+    background-color: var(--background-light);
+}
+
+.services h2,
+.why-us h2 {
+    text-align: center;
+    margin-bottom: 4rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.service-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--shadow);
+    height: 100%;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.service-card i {
+    font-size: 3rem;
+    color: var(--accent-color);
+    margin-bottom: 1.8rem;
+}
+
+.service-card h3 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.feature {
+    text-align: center;
+    padding: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.feature i {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.feature h3 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: var(--text-light);
+    text-align: center;
+    padding: 5rem 0;
+}
+
+.cta-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.cta-section .cta-button {
+    background-color: var(--secondary-color);
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.cta-section .cta-button:hover {
+    background-color: #d35400;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .services,
+    .why-us {
+        padding: 4rem 0;
+    }
+
+    .service-card {
+        margin-bottom: 2rem;
+    }
+}
