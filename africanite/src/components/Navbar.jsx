@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Container, Navbar, Nav } from "react-bootstrap";
 import { motion } from "framer-motion";
-import logo from "../assets/logo-africanite.png"; // Adjust the path to your logo file
+import logo from "../assets/logo-africanite.png"; // Ajustez le chemin vers votre logo
 import "../styles/Navbar.css";
 
 const NavbarComponent = () => {
-    const location = useLocation(); // Get the current route
-    const [expanded, setExpanded] = useState(false); // State to control the navbar collapse
+    const location = useLocation(); // Obtenez la route actuelle
+    const [expanded, setExpanded] = useState(false); // État pour contrôler le menu déroulant
 
     const handleNavClick = () => {
-        setExpanded(false); // Close the dropdown when a menu item is clicked
+        setExpanded(false); // Fermez le menu déroulant lorsqu'un élément est cliqué
     };
 
     return (
@@ -23,12 +23,12 @@ const NavbarComponent = () => {
                 expand="lg"
                 className="navbar"
                 sticky="top"
-                expanded={expanded} // Control the expanded state
-                onToggle={(isExpanded) => setExpanded(isExpanded)} // Update state on toggle
+                expanded={expanded} // Contrôlez l'état du menu déroulant
+                onToggle={(isExpanded) => setExpanded(isExpanded)} // Mettez à jour l'état lors du basculement
             >
                 <Container>
                     <Navbar.Brand as={Link} to="/">
-                        <img src={logo} alt="Africanite Logo" className="logo" />
+                        <img src={logo} alt="Logo Africanite" className="logo" />
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="navbar-nav" />
                     <Navbar.Collapse id="navbar-nav">
@@ -37,25 +37,33 @@ const NavbarComponent = () => {
                                 as={Link}
                                 to="/"
                                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-                                onClick={handleNavClick} // Close dropdown on click
+                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
                             >
-                                Home
+                                Accueil
+                            </Nav.Link>
+                            <Nav.Link
+                                as={Link}
+                                to="/services"
+                                className={`nav-link ${location.pathname === "/services" ? "active" : ""}`}
+                                onClick={handleNavClick}
+                            >
+                                Nos Services
                             </Nav.Link>
                             <Nav.Link
                                 as={Link}
                                 to="/about"
                                 className={`nav-link ${location.pathname === "/about" ? "active" : ""}`}
-                                onClick={handleNavClick} // Close dropdown on click
+                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
                             >
-                                About Us
+                                À Propos
                             </Nav.Link>
                             <Nav.Link
                                 as={Link}
                                 to="/contact"
                                 className={`nav-link ${location.pathname === "/contact" ? "active" : ""}`}
-                                onClick={handleNavClick} // Close dropdown on click
+                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
                             >
-                                Contact Us
+                                Contact
                             </Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
