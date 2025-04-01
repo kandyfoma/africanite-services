@@ -11,4 +11,5 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/components'), // Alias for components directory (optional)
     },
   },
+  base: '/africanite-services/', // Replace 'africanite-services' with your repository name
 });
