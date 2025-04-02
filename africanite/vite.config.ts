@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/africanite-services/',
+  base: '/', // Set to '/' for Vercel deployment
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
