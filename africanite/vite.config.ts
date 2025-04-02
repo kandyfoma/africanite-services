@@ -10,14 +10,17 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       output: {
-        manualChunks: undefined
-      }
-    }
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {
       '@styles': path.resolve(__dirname, './src/styles'),
       '@components': path.resolve(__dirname, './src/components'),
     },
+  },
+  server: {
+    historyApiFallback: true, // Ensure client-side routing works
   },
 })
