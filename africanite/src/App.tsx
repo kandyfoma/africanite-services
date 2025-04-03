@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 
 const App: React.FC = () => {
     return (
-        <Router basename="/africanite-services">
+        <Router>
             <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
                 <Navbar />
                 <main style={{ flex: "1" }}>
