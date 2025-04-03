@@ -104,7 +104,7 @@ const ContactUs = () => {
                                     </div>
                                     <div className="info-item">
                                         <FontAwesomeIcon icon={faMapMarkerAlt} className="info-icon" />
-                                        <p>18 Av. Usoke, C/Kampemba, Haut Katanga, Lubumbashi, Republique Democratic Du Congo</p>
+                                        <p>18 Av. Usoke, C/Kampemba, Haut Katanga, Lubumbashi, République démocratique du Congo</p>
                                     </div>
                                 </div>
                             </motion.div>

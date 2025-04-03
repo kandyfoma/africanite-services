@@ -6,6 +6,7 @@ import ContactUs from "./components/ContactUs";
 import Services from "./components/Services"; // Import the new Services component
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 
 const App: React.FC = () => {
     return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/about" element={<AboutUs />} />
                         <Route path="/contact" element={<ContactUs />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         <Route path="/services" element={<Services />} /> {/* New Route */}
                     </Routes>
                 </main>

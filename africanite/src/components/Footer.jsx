@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import "../styles/Footer.css";
 
 const Footer = () => {
+    const currentYear = new Date().getFullYear();
     return (
         <footer className="footer">
             <Container>
@@ -64,7 +65,7 @@ const Footer = () => {
                     <hr />
                     <Row className="footer-bottom">
                         <Col md={6} className="text-center text-md-start">
-                            <p>&copy; 2025 Africanite Services. Tous droits réservés.</p>
+                            <p>&copy; {currentYear} Africanite Services. Tous droits réservés.</p>
                         </Col>
                         <Col md={6} className="text-center text-md-end">
                             <ul className="footer-links">
