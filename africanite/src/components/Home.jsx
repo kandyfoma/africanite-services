@@ -42,7 +42,7 @@ const Home = () => {
             <section className="services">
                 <Container>
                     <h2>Nos Services</h2>
-                    <Row className="services-grid">
+                    <Row>
                         {[
                             {
                                 icon: "fa-globe",
@@ -65,7 +65,7 @@ const Home = () => {
                                 description: "Support et maintenance informatique complets pour votre entreprise"
                             }
                         ].map((service, index) => (
-                            <Col key={index} md={6} lg={3}>
+                            <Col key={index} md={4} className="mb-4">
                                 <motion.div
                                     className="service-card"
                                     whileHover={{ scale: 1.05 }}
@@ -87,46 +87,39 @@ const Home = () => {
             <section className="why-us">
                 <Container>
                     <h2>Pourquoi Choisir Africanite Services?</h2>
-                    <Row className="features-grid">
-                        <Col md={4}>
-                            <motion.div
-                                className="feature"
-                                whileHover={{ scale: 1.05 }}
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                            >
-                                <i className="fas fa-check-circle"></i>
-                                <h3>Expertise</h3>
-                                <p>Des années d'expérience dans la fourniture de solutions informatiques de qualité</p>
-                            </motion.div>
-                        </Col>
-                        <Col md={4}>
-                            <motion.div
-                                className="feature"
-                                whileHover={{ scale: 1.05 }}
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                            >
-                                <i className="fas fa-handshake"></i>
-                                <h3>Orienté Client</h3>
-                                <p>Dévoué à comprendre et répondre à vos besoins spécifiques</p>
-                            </motion.div>
-                        </Col>
-                        <Col md={4}>
-                            <motion.div
-                                className="feature"
-                                whileHover={{ scale: 1.05 }}
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                            >
-                                <i className="fas fa-rocket"></i>
-                                <h3>Innovation</h3>
-                                <p>Utilisation des dernières technologies pour des solutions optimales</p>
-                            </motion.div>
-                        </Col>
+                    <Row>
+                        {[
+                            {
+                                icon: "fa-check-circle",
+                                title: "Expertise",
+                                description: "Des années d'expérience dans la fourniture de solutions informatiques de qualité"
+                            },
+                            {
+                                icon: "fa-handshake",
+                                title: "Orienté Client",
+                                description: "Dévoué à comprendre et répondre à vos besoins spécifiques"
+                            },
+                            {
+                                icon: "fa-rocket",
+                                title: "Innovation",
+                                description: "Utilisation des dernières technologies pour des solutions optimales"
+                            }
+                        ].map((feature, index) => (
+                            // Services Section - Update the Col props
+                            <Col key={index} md={4} className="mb-4">
+                                <motion.div
+                                    className="feature"
+                                    whileHover={{ scale: 1.05 }}
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
+                                    viewport={{ once: true }}
+                                >
+                                    <i className={`fas ${feature.icon}`}></i>
+                                    <h3>{feature.title}</h3>
+                                    <p>{feature.description}</p>
+                                </motion.div>
+                            </Col>
+                        ))}
                     </Row>
                 </Container>
             </section>
