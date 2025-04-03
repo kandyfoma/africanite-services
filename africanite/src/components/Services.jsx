@@ -26,6 +26,27 @@ const Services = () => {
             duration: "6 à 12 semaines",
             cost: "À partir de 4,000$",
         },
+        {
+            title: "Applications IA",
+            description:
+                "Nous développons des applications intelligentes utilisant l'IA pour automatiser vos processus métier et améliorer la prise de décision.",
+            duration: "8 à 16 semaines",
+            cost: "À partir de 5,000$",
+        },
+        {
+            title: "Chatbot IA",
+            description:
+                "Nous créons des chatbots intelligents sur mesure pour améliorer votre service client et automatiser les interactions avec vos utilisateurs.",
+            duration: "4 à 8 semaines",
+            cost: "À partir de 2,000$",
+        },
+        {
+            title: "Support IA",
+            description:
+                "Nous intégrons des solutions de support alimentées par l'IA pour offrir une assistance 24/7 à vos clients et optimiser vos opérations.",
+            duration: "3 à 6 semaines",
+            cost: "À partir de 1,500$",
+        },
     ];
 
     const additionalServices = [
