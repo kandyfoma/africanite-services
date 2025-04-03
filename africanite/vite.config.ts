@@ -4,20 +4,25 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/', // Set to '/' for Vercel deployment
+  base: '/', // Ensure this is set to '/' for Vercel
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
     rollupOptions: {
       output: {
-        manualChunks: undefined
-      }
-    }
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {
       '@styles': path.resolve(__dirname, './src/styles'),
       '@components': path.resolve(__dirname, './src/components'),
+    },
+  },
+  server: {
+    fs: {
+      strict: true,
     },
   },
 })
