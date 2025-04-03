@@ -1,23 +1,26 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root {
-    --primary-color: #2a9d8f;
-    /* Green (Primary) */
-    --secondary-color: #264653;
-    /* Dark Green */
-    --accent-color: #e9c46a;
-    /* Yellow Accent */
-    --background-light: #f4f1de;
-    /* Light Neutral Background */
-    --text-dark: #264653;
-    /* Dark Text */
-    --text-light: #f4f1de;
-    /* Light Text */
-    --button-light: #3cbfae;
-    /* Lighter Green for Buttons */
-    --button-hover: #45d1c0;
-    /* Even Lighter Green for Hover */
-    --shadow: rgba(0, 0, 0, 0.1);
+    --primary-color: #2C6E49;
+    /* Dark Green (Primary) */
+    --secondary-color: #4C956C;
+    /* Medium Green */
+    --background-light: #FEFEE3;
+    /* Light Cream Background */
+    --accent-color: #FFC9B9;
+    /* Soft Peach Accent */
+    --accent-dark: #D68C45;
+    /* Warm Brown */
+    --text-dark: #2C6E49;
+    /* Dark Green for Text */
+    --text-light: #FEFEE3;
+    /* Light Cream for Text */
+    --button-light: #FFC9B9;
+    /* Soft Peach for Buttons */
+    --button-hover: #D68C45;
+    /* Warm Brown for Hover */
+    --shadow: rgba(44, 110, 73, 0.1);
+    /* Based on primary-color */
 }
 
 .home {
@@ -26,7 +29,7 @@
 }
 
 .hero {
-    background: linear-gradient(rgba(42, 157, 143, 0.85), rgba(233, 196, 106, 0.85));
+    background: linear-gradient(rgba(44, 110, 73, 0.85), rgba(76, 149, 108, 0.85));
     min-height: 90vh;
     display: flex;
     align-items: center;
@@ -36,55 +39,84 @@
 
 .hero-content {
     padding: 3rem 0;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .hero h1 {
-    font-size: 3.8rem;
-    margin-bottom: 1.8rem;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: var(--text-light);
+    /* Light Cream for Text */
+    line-height: 1.2;
+    text-align: center;
 }
 
 .hero p {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     margin-bottom: 2rem;
     line-height: 1.6;
+    color: var(--text-light);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hero-subtitle {
+    font-size: 1.4rem;
+    margin: 2.5rem 0;
+    color: var(--text-light);
+    letter-spacing: 0.8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hero-subtitle span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    transition: transform 0.3s ease;
+}
+
+.hero-subtitle span:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .hero .cta-button {
     background-color: var(--button-light);
-    /* Lighter Green for Buttons */
     border: none;
-    padding: 1rem 2.5rem;
-    font-size: 1.1rem;
+    padding: 1.2rem 3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-light);
-    border-radius: 5px;
-    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
 .hero .cta-button:hover {
     background-color: var(--button-hover);
-    /* Even Lighter Green for Hover */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-.services-grid {
-    row-gap: 2rem;
-}
-.services,
-.why-us {
-    padding: 6rem 0;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .services {
     background-color: var(--background-light);
+    padding: 6rem 0;
 }
 
-.services h2,
-.why-us h2 {
+.services h2 {
     text-align: center;
     margin-bottom: 4rem;
     color: var(--primary-color);
@@ -93,7 +125,7 @@
 }
 
 .service-card {
-    background: white;
+    background: var(--background-light);
     padding: 2.5rem 2rem;
     border-radius: 15px;
     box-shadow: 0 10px 30px var(--shadow);
@@ -117,27 +149,8 @@
     color: var(--primary-color);
     font-weight: 600;
     margin-bottom: 1rem;
-    font-size: 1.2rem; /* Adjusted font size for better fit */
-    word-wrap: break-word; /* Ensure long words break to the next line */
+    font-size: 1.2rem;
     text-align: center;
-}
-
-.feature {
-    text-align: center;
-    padding: 2.5rem;
-    transition: transform 0.3s ease;
-}
-
-.feature i {
-    font-size: 3rem;
-    color: var(--secondary-color);
-    margin-bottom: 1.5rem;
-}
-
-.feature h3 {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 1rem;
 }
 
 .cta-section {
@@ -160,7 +173,6 @@
 
 .cta-section .cta-button {
     background-color: var(--button-light);
-    /* Lighter Green for Buttons */
     border: none;
     padding: 1rem 3rem;
     font-size: 1.2rem;
@@ -174,7 +186,6 @@
 
 .cta-section .cta-button:hover {
     background-color: var(--button-hover);
-    /* Even Lighter Green for Hover */
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }

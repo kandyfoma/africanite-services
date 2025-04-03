@@ -12,20 +12,27 @@ const Home = () => {
             {/* Hero Section */}
             <section className="hero">
                 <Container>
-                    <motion.div 
+                    <motion.div
                         className="hero-content"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h1>Transformez Votre Vision Numérique en Réalité</h1>
-                        <p>Votre partenaire de confiance en conseil informatique, développement web et innovation numérique</p>
-                        <Button 
-                            variant="primary" 
+                        <h1>Propulsez Votre Entreprise vers le Futur Numérique</h1>
+                        <p>
+                            Des solutions technologiques innovantes qui transforment votre vision en succès.
+                            De l'intelligence artificielle au développement web, nous créons des expériences
+                            numériques qui démarquent votre entreprise de la concurrence.
+                        </p>
+                        <p className="hero-subtitle">
+                            🚀 Solutions sur mesure | 🤖 IA intégrée | ⚡ Développement rapide | 🛡️ Support 24/7
+                        </p>
+                        <Button
+                            variant="primary"
                             className="cta-button"
-                            onClick={() => navigate("/contact")}
+                            onClick={() => navigate("/services")}
                         >
-                            Commencer
+                            Découvrir Nos Solutions
                         </Button>
                     </motion.div>
                 </Container>
@@ -59,7 +66,7 @@ const Home = () => {
                             }
                         ].map((service, index) => (
                             <Col key={index} md={6} lg={3}>
-                                <motion.div 
+                                <motion.div
                                     className="service-card"
                                     whileHover={{ scale: 1.05 }}
                                     initial={{ opacity: 0, y: 20 }}
@@ -82,7 +89,7 @@ const Home = () => {
                     <h2>Pourquoi Choisir Africanite Services?</h2>
                     <Row className="features-grid">
                         <Col md={4}>
-                            <motion.div 
+                            <motion.div
                                 className="feature"
                                 whileHover={{ scale: 1.05 }}
                                 initial={{ opacity: 0 }}
@@ -95,7 +102,7 @@ const Home = () => {
                             </motion.div>
                         </Col>
                         <Col md={4}>
-                            <motion.div 
+                            <motion.div
                                 className="feature"
                                 whileHover={{ scale: 1.05 }}
                                 initial={{ opacity: 0 }}
@@ -108,7 +115,7 @@ const Home = () => {
                             </motion.div>
                         </Col>
                         <Col md={4}>
-                            <motion.div 
+                            <motion.div
                                 className="feature"
                                 whileHover={{ scale: 1.05 }}
                                 initial={{ opacity: 0 }}
@@ -134,9 +141,9 @@ const Home = () => {
                     >
                         <h2>Prêt à Commencer Votre Voyage Numérique?</h2>
                         <p>Discutons de la façon dont nous pouvons transformer votre entreprise</p>
-                        <Button 
-                            variant="warning" 
-                            size="lg" 
+                        <Button
+                            variant="warning"
+                            size="lg"
                             className="cta-button"
                             onClick={() => navigate("/contact")}
                         >
