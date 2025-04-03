@@ -47,10 +47,10 @@ const ContactUs = () => {
 
         emailjs
             .sendForm(
-                import.meta.env.VITE_EMAILJS_SERVICE_ID, // Updated to use Vite environment variables
-                import.meta.env.VITE_EMAILJS_TEMPLATE_ID, // Updated to use Vite environment variables
+                process.env.REACT_APP_EMAILJS_SERVICE_ID,
+                process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
                 form.current,
-                import.meta.env.VITE_EMAILJS_PUBLIC_KEY // Updated to use Vite environment variables
+                process.env.REACT_APP_EMAILJS_PUBLIC_KEY
             )
             .then(
                 (result) => {
@@ -59,6 +59,7 @@ const ContactUs = () => {
                     form.current.reset();
                 },
                 (error) => {
+                    console.error("EmailJS Error:", error); // Log the error
                     setMessage("Une erreur s'est produite. Veuillez réessayer.");
                     setMessageType("error");
                 }
