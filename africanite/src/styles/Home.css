@@ -2,25 +2,19 @@
 
 :root {
     --primary-color: #2C6E49;
-    /* Dark Green (Primary) */
+    /* Dark Green */
     --secondary-color: #4C956C;
     /* Medium Green */
-    --background-light: #FEFEE3;
-    /* Light Cream Background */
-    --accent-color: #dda15e;
-    /* Soft Peach Accent */
-    --accent-dark: #D68C45;
-    /* Warm Brown */
-    --text-dark: #2C6E49;
-    /* Dark Green for Text */
-    --text-light: #FEFEE3;
-    /* Light Cream for Text */
-    --button-light: #dda15e;
-    /* Soft Peach for Buttons */
-    --button-hover: #D68C45;
-    /* Warm Brown for Hover */
+    --background-light: #F4F1DE;
+    /* Light Cream */
+    --accent-color: #DDA15E;
+    /* Gold Accent */
+    --text-dark: #283618;
+    /* Charcoal */
+    --button-hover: #4C956C;
+    /* Medium Green for Hover */
     --shadow: rgba(44, 110, 73, 0.1);
-    /* Based on primary-color */
+    /* Based on primary color */
 }
 
 .home {
@@ -121,7 +115,8 @@
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin: 0 auto;
-    max-width: 350px; /* Set maximum width for cards */
+    max-width: 350px;
+    /* Set maximum width for cards */
 }
 
 .service-card:hover {
@@ -178,7 +173,8 @@
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin: 0 auto;
-    max-width: 350px; /* Set maximum width for cards */
+    max-width: 350px;
+    /* Set maximum width for cards */
 }
 
 .feature:hover {
