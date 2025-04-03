@@ -65,7 +65,7 @@ const Home = () => {
                                 description: "Support et maintenance informatique complets pour votre entreprise"
                             }
                         ].map((service, index) => (
-                            <Col key={index} md={4} className="mb-4">
+                            <Col key={index} md={3} className="mb-4">
                                 <motion.div
                                     className="service-card"
                                     whileHover={{ scale: 1.05 }}
