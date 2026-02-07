@@ -3,10 +3,10 @@ import { Container } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faPhone,
-    faWhatsapp,
     faEnvelope,
     faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import "../styles/ContactUs.css";
 
 const ContactUs = () => {

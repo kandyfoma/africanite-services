@@ -51,6 +51,14 @@ const NavbarComponent = () => {
                             </Nav.Link>
                             <Nav.Link
                                 as={Link}
+                                to="/qrcode"
+                                className={`nav-link ${location.pathname === "/qrcode" ? "active" : ""}`}
+                                onClick={handleNavClick}
+                            >
+                                QR Code
+                            </Nav.Link>
+                            <Nav.Link
+                                as={Link}
                                 to="/about"
                                 className={`nav-link ${location.pathname === "/about" ? "active" : ""}`}
                                 onClick={handleNavClick} // Fermez le menu déroulant lors du clic

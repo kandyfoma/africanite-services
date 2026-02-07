@@ -1,0 +1,59 @@
+.payment-summary {
+    background-color: #F4F1DE;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #2C6E49;
+}
+
+.payment-summary h5 {
+    color: #2C6E49;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.provider-detected {
+    background-color: #ECFDF5;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 2px solid #10B981;
+}
+
+.provider-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.modal-header {
+    border-bottom: 2px solid #2C6E49;
+}
+
+.modal-title {
+    color: #2C6E49;
+    font-weight: bold;
+}
+
+.modal-footer .btn-primary {
+    background-color: #2C6E49;
+    border: none;
+}
+
+.modal-footer .btn-primary:hover:not(:disabled) {
+    background-color: #4C956C;
+}
+
+.modal-footer .btn-primary:disabled {
+    background-color: #7F8C8D;
+}
+
+.modal-footer .btn-outline-secondary {
+    border-color: #DDA15E;
+    color: #DDA15E;
+}
+
+.modal-footer .btn-outline-secondary:hover:not(:disabled) {
+    background-color: #DDA15E;
+    color: white;
+}
