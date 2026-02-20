@@ -360,7 +360,7 @@ const QRCodeGenerator: React.FC = () => {
                                                 type="url"
                                                 placeholder="https://example.com"
                                                 value={url}
-                                                onChange={handleUrlChange}
+                                                onChange={(e) => handleUrlChange(e.target.value)}
                                                 required
                                                 isInvalid={!!urlError}
                                                 isValid={isUrlValid && url.length > 0}

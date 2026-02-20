@@ -51,6 +51,14 @@ const NavbarComponent = () => {
                             </Nav.Link>
                             <Nav.Link
                                 as={Link}
+                                to="/hk-management-system"
+                                className={`nav-link ${location.pathname === "/hk-management-system" ? "active" : ""}`}
+                                onClick={handleNavClick}
+                            >
+                                HK Management
+                            </Nav.Link>
+                            <Nav.Link
+                                as={Link}
                                 to="/qrcode"
                                 className={`nav-link ${location.pathname === "/qrcode" ? "active" : ""}`}
                                 onClick={handleNavClick}

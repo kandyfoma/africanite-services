@@ -5,6 +5,7 @@ import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import Services from "./components/Services";
 import QRCode from "./components/QRCode";
+import HKManagementSystem from "./components/HKManagementSystem";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import PrivacyPolicy from "./components/PrivacyPolicy";
@@ -24,6 +25,7 @@ const App: React.FC = () => {
                         <Route path="/contact" element={<ContactUs />} />
                         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         <Route path="/services" element={<Services />} />
+                        <Route path="/hk-management-system" element={<HKManagementSystem />} />
                         <Route path="/qrcode" element={<QRCode />} />
                     </Routes>
                 </main>

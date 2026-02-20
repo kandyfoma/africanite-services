@@ -2,6 +2,15 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## HK Management System download links
+
+The HK Management page uses Vite environment variables for download buttons:
+
+- `VITE_HK_WEB_APP_URL`
+- `VITE_HK_ANDROID_APP_URL`
+
+Create a `.env` file from `.env.example` and set both values before deployment.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
