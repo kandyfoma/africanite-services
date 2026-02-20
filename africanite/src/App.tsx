@@ -10,8 +10,8 @@ import Footer from "./components/Footer";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 
 const App: React.FC = () => {
-    // Use base path for GitHub Pages deployment
-    const basename = import.meta.env.MODE === 'production' ? '/africanite-services' : '/';
+    const isGitHubPages = window.location.hostname.endsWith('github.io');
+    const basename = isGitHubPages ? '/africanite-services' : '/';
     
     return (
         <Router basename={basename}>
