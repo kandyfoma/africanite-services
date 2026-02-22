@@ -117,25 +117,27 @@ const HKManagementSystem = () => {
                     <div className="hk-download-buttons">
                         <Button
                             variant="primary"
-                            className="hk-download-btn"
+                            className="hk-download-btn hk-logo-only"
                             as="a"
                             href={webAppUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="Ouvrir la Web App"
+                            title="Ouvrir la Web App"
                         >
                             <img src={windowsLogo} alt="Windows" className="hk-store-logo" />
-                            Ouvrir la Web App
                         </Button>
                         <Button
                             variant="warning"
-                            className="hk-download-btn"
+                            className="hk-download-btn hk-logo-only"
                             as="a"
                             href={androidAppUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="Télécharger l'App Android"
+                            title="Télécharger l'App Android"
                         >
                             <img src={googlePlayLogo} alt="Google Play" className="hk-store-logo" />
-                            Télécharger l&apos;App Android
                         </Button>
                     </div>
                     <p className="hk-download-note">

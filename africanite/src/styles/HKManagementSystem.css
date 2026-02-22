@@ -73,9 +73,16 @@
     font-weight: 600;
 }
 
+.hk-logo-only {
+    min-width: 72px;
+    width: 72px;
+    height: 52px;
+    padding: 0;
+}
+
 .hk-store-logo {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
