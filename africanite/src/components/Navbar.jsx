@@ -1,17 +1,24 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Container, Navbar, Nav } from "react-bootstrap";
+import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { motion } from "framer-motion";
-import logo from "../assets/logo-africanite.png"; // Ajustez le chemin vers votre logo
+import logo from "../assets/logo-africanite.png";
 import "../styles/Navbar.css";
 
 const NavbarComponent = () => {
-    const location = useLocation(); // Obtenez la route actuelle
-    const [expanded, setExpanded] = useState(false); // État pour contrôler le menu déroulant
+    const location = useLocation();
+    const [expanded, setExpanded] = useState(false);
 
     const handleNavClick = () => {
-        setExpanded(false); // Fermez le menu déroulant lorsqu'un élément est cliqué
+        setExpanded(false);
     };
+
+    const isApplicationActive = [
+        "/hk-management-system",
+        "/wennze",
+        "/goshopper",
+        "/qrcode"
+    ].includes(location.pathname);
 
     return (
         <motion.div
@@ -37,7 +44,7 @@ const NavbarComponent = () => {
                                 as={Link}
                                 to="/"
                                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
+                                onClick={handleNavClick}
                             >
                                 Accueil
                             </Nav.Link>
@@ -49,27 +56,49 @@ const NavbarComponent = () => {
                             >
                                 Nos Services
                             </Nav.Link>
-                            <Nav.Link
-                                as={Link}
-                                to="/hk-management-system"
-                                className={`nav-link ${location.pathname === "/hk-management-system" ? "active" : ""}`}
-                                onClick={handleNavClick}
+                            <NavDropdown
+                                title="Nos Applications"
+                                id="applications-dropdown"
+                                className={`nav-dropdown ${isApplicationActive ? "active" : ""}`}
                             >
-                                HK Management
-                            </Nav.Link>
-                            <Nav.Link
-                                as={Link}
-                                to="/qrcode"
-                                className={`nav-link ${location.pathname === "/qrcode" ? "active" : ""}`}
-                                onClick={handleNavClick}
-                            >
-                                QR Code
-                            </Nav.Link>
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/hk-management-system"
+                                    onClick={handleNavClick}
+                                    active={location.pathname === "/hk-management-system"}
+                                >
+                                    HK Management System
+                                </NavDropdown.Item>
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/wennze"
+                                    onClick={handleNavClick}
+                                    active={location.pathname === "/wennze"}
+                                >
+                                    Wennze
+                                </NavDropdown.Item>
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/goshopper"
+                                    onClick={handleNavClick}
+                                    active={location.pathname === "/goshopper"}
+                                >
+                                    GoShopper
+                                </NavDropdown.Item>
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/qrcode"
+                                    onClick={handleNavClick}
+                                    active={location.pathname === "/qrcode"}
+                                >
+                                    QR Code Generator
+                                </NavDropdown.Item>
+                            </NavDropdown>
                             <Nav.Link
                                 as={Link}
                                 to="/about"
                                 className={`nav-link ${location.pathname === "/about" ? "active" : ""}`}
-                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
+                                onClick={handleNavClick}
                             >
                                 À Propos
                             </Nav.Link>
@@ -77,7 +106,7 @@ const NavbarComponent = () => {
                                 as={Link}
                                 to="/contact"
                                 className={`nav-link ${location.pathname === "/contact" ? "active" : ""}`}
-                                onClick={handleNavClick} // Fermez le menu déroulant lors du clic
+                                onClick={handleNavClick}
                             >
                                 Contact
                             </Nav.Link>

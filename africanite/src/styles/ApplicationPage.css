@@ -1,0 +1,187 @@
+.app-page {
+    padding: 4rem 1rem;
+    background-color: var(--background-color);
+}
+
+.app-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.app-hero h1 {
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+    font-size: 2.8rem;
+    font-weight: bold;
+}
+
+.app-tagline {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.app-hero p {
+    color: var(--text-dark);
+    max-width: 900px;
+    margin: 0 auto 1rem;
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+.app-features h2,
+.app-downloads h2,
+.app-info h2 {
+    text-align: center;
+    color: var(--secondary-color);
+    margin-bottom: 2.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.feature-card {
+    background: var(--text-light);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.feature-card p {
+    margin: 0;
+    color: var(--text-dark);
+    line-height: 1.7;
+}
+
+.app-downloads {
+    margin-top: 3rem;
+    text-align: center;
+    padding: 2rem;
+    background: rgba(42, 157, 143, 0.08);
+    border-radius: 15px;
+}
+
+.app-downloads p {
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.download-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.store-logo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 3.5rem;
+    transition: all 0.3s ease;
+    padding: 0;
+    outline: none;
+}
+
+.store-logo-btn:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.store-logo-btn .store-logo {
+    width: 140px;
+    height: auto;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.store-logo-btn:hover .store-logo {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.app-info {
+    margin-top: 3rem;
+}
+
+.info-card {
+    background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(76, 149, 108, 0.1) 100%);
+    border: 2px solid rgba(42, 157, 143, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 15px rgba(42, 157, 143, 0.15);
+}
+
+.info-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.info-card h3 {
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.info-card p {
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .app-page {
+        padding: 2.5rem 1rem;
+    }
+
+    .app-hero h1 {
+        font-size: 2rem;
+    }
+
+    .app-tagline {
+        font-size: 1.1rem;
+    }
+
+    .app-features h2,
+    .app-downloads h2,
+    .app-info h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .download-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .download-btn {
+        width: 90%;
+        max-width: 250px;
+    }
+}
