@@ -110,7 +110,9 @@ const WennzePage = () => {
                             className="store-logo-btn"
                             title="App Store"
                         >
-                            🍎
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="currentColor" stroke="currentColor" strokeWidth="0.5">
+                                <path d="M17.5 1.5H6.5c-2.75 0-5 2.25-5 5v11c0 2.75 2.25 5 5 5h11c2.75 0 5-2.25 5-5v-11c0-2.75-2.25-5-5-5zm-5.5 18c-1.933 0-3.5-1.567-3.5-3.5S10.067 9 12 9s3.5 1.567 3.5 3.5-1.567 3.5-3.5 3.5z"/>
+                            </svg>
                         </a>
                     </div>
                 </section>

@@ -1,6 +1,7 @@
 .hk-management-page {
-    padding: 4rem 1rem;
-    background-color: var(--background-color);
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+    min-height: 80vh;
 }
 
 .hk-hero {

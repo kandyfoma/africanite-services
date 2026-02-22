@@ -1,11 +1,16 @@
 .app-page {
-    padding: 4rem 1rem;
-    background-color: var(--background-color);
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+    min-height: 80vh;
 }
 
 .app-hero {
     text-align: center;
     margin-bottom: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .app-hero h1 {
@@ -23,11 +28,19 @@
 }
 
 .app-hero p {
-    color: var(--text-dark);
+    color: #555;
     max-width: 900px;
     margin: 0 auto 1rem;
     line-height: 1.8;
     font-size: 1.05rem;
+}
+
+.app-features {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .app-features h2,
@@ -41,16 +54,18 @@
 }
 
 .feature-card {
-    background: var(--text-light);
+    background: linear-gradient(135deg, rgba(42, 157, 143, 0.05) 0%, rgba(76, 149, 108, 0.05) 100%);
+    border: 1px solid rgba(42, 157, 143, 0.1);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     height: 100%;
     transition: all 0.3s ease;
 }
 
 .feature-card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 15px rgba(42, 157, 143, 0.15);
+    transform: translateY(-2px);
 }
 
 .feature-card h3 {
@@ -62,20 +77,21 @@
 
 .feature-card p {
     margin: 0;
-    color: var(--text-dark);
+    color: #555;
     line-height: 1.7;
 }
 
 .app-downloads {
-    margin-top: 3rem;
-    text-align: center;
-    padding: 2rem;
-    background: rgba(42, 157, 143, 0.08);
+    background: white;
     border-radius: 15px;
+    margin-top: 3rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .app-downloads p {
-    color: var(--text-dark);
+    color: #666;
     margin-bottom: 2rem;
     font-size: 1.1rem;
 }
@@ -104,7 +120,12 @@
 
 .store-logo-btn:hover {
     transform: scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 4px 12px rgba(42, 157, 143, 0.3));
+}
+
+.store-logo-btn.web-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
 }
 
 .store-logo-btn .store-logo {
@@ -115,16 +136,20 @@
 }
 
 .store-logo-btn:hover .store-logo {
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 4px 12px rgba(42, 157, 143, 0.3));
 }
 
 .app-info {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem 2rem;
     margin-top: 3rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .info-card {
-    background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(76, 149, 108, 0.1) 100%);
-    border: 2px solid rgba(42, 157, 143, 0.2);
+    background: linear-gradient(135deg, rgba(42, 157, 143, 0.08) 0%, rgba(76, 149, 108, 0.08) 100%);
+    border: 1px solid rgba(42, 157, 143, 0.15);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
@@ -134,7 +159,8 @@
 
 .info-card:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 6px 15px rgba(42, 157, 143, 0.15);
+    box-shadow: 0 6px 15px rgba(42, 157, 143, 0.2);
+    transform: translateY(-2px);
 }
 
 .info-icon {
@@ -150,14 +176,18 @@
 }
 
 .info-card p {
-    color: var(--text-dark);
+    color: #555;
     line-height: 1.6;
     margin: 0;
 }
 
 @media (max-width: 768px) {
     .app-page {
-        padding: 2.5rem 1rem;
+        padding: 1.5rem 0.5rem;
+    }
+
+    .app-hero {
+        padding: 1.5rem;
     }
 
     .app-hero h1 {
@@ -168,6 +198,11 @@
         font-size: 1.1rem;
     }
 
+    .app-features,
+    .app-info {
+        padding: 2rem 1rem;
+    }
+
     .app-features h2,
     .app-downloads h2,
     .app-info h2 {
@@ -176,12 +211,15 @@
     }
 
     .download-buttons {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        gap: 1.5rem;
     }
 
-    .download-btn {
-        width: 90%;
-        max-width: 250px;
+    .store-logo-btn {
+        font-size: 2.5rem;
+    }
+
+    .store-logo-btn .store-logo {
+        width: 100px;
     }
 }
