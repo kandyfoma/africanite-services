@@ -2,9 +2,11 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { motion } from "framer-motion";
 import googlePlayLogo from "../assets/google play.png";
+import appStoreLogo from "../assets/applestore.png";
 import "../styles/ApplicationPage.css";
 
 const GoShopperPage = () => {
+    const webAppUrl = "https://goshopper.app";
     const androidAppUrl = import.meta.env.VITE_GOSHOPPER_ANDROID_APP_URL || "#";
     const iosAppUrl = import.meta.env.VITE_GOSHOPPER_IOS_APP_URL || "#";
 
@@ -81,9 +83,21 @@ const GoShopperPage = () => {
                 <section className="app-downloads">
                     <h2>Télécharger GoShopper</h2>
                     <p>
-                        Disponible sur iOS et Android pour un suivi de dépenses en toute circonstance.
+                        Disponible sur web, iOS et Android pour un suivi de dépenses complet.
                     </p>
                     <div className="download-buttons">
+                        <a 
+                            href={webAppUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="store-logo-btn"
+                            title="Accéder au Web"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                        </a>
                         <a 
                             href={androidAppUrl}
                             target="_blank"
@@ -100,9 +114,7 @@ const GoShopperPage = () => {
                             className="store-logo-btn"
                             title="App Store"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="currentColor" stroke="currentColor" strokeWidth="0.5">
-                                <path d="M17.5 1.5H6.5c-2.75 0-5 2.25-5 5v11c0 2.75 2.25 5 5 5h11c2.75 0 5-2.25 5-5v-11c0-2.75-2.25-5-5-5zm-5.5 18c-1.933 0-3.5-1.567-3.5-3.5S10.067 9 12 9s3.5 1.567 3.5 3.5-1.567 3.5-3.5 3.5z"/>
-                            </svg>
+                            <img src={appStoreLogo} alt="App Store" className="store-logo" />
                         </a>
                     </div>
                 </section>

@@ -139,6 +139,18 @@
     filter: drop-shadow(0 4px 12px rgba(42, 157, 143, 0.3));
 }
 
+.store-logo-btn svg {
+    width: 60px;
+    height: 60px;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.store-logo-btn:hover svg {
+    color: var(--secondary-color);
+    filter: drop-shadow(0 4px 12px rgba(42, 157, 143, 0.3));
+}
+
 .app-info {
     background: white;
     border-radius: 15px;

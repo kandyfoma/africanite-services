@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { motion } from "framer-motion";
 import googlePlayLogo from "../assets/google play.png";
 import windowsLogo from "../assets/windows-button.png";
@@ -17,7 +17,7 @@ const HKManagementSystem = () => {
             transition={{ duration: 0.8 }}
         >
             <Container>
-                <section className="hk-hero">
+                <section className="app-hero">
                     <h1>HK Management System</h1>
                     <p>
                         HK Management System est une plateforme santé tout-en-un
@@ -31,7 +31,7 @@ const HKManagementSystem = () => {
                     </p>
                 </section>
 
-                <section className="hk-features">
+                <section className="app-features">
                     <h2>Modules principaux</h2>
                     <Row>
                         {[
@@ -58,7 +58,7 @@ const HKManagementSystem = () => {
                         ].map((feature, index) => (
                             <Col key={index} md={6} className="mb-4">
                                 <motion.div
-                                    className="hk-feature-card"
+                                    className="feature-card"
                                     whileHover={{ scale: 1.03 }}
                                     transition={{ duration: 0.3 }}
                                 >
@@ -70,7 +70,7 @@ const HKManagementSystem = () => {
                     </Row>
                 </section>
 
-                <section className="hk-features">
+                <section className="app-features">
                     <h2>Pourquoi choisir HK Management System ?</h2>
                     <Row>
                         {[
@@ -97,7 +97,7 @@ const HKManagementSystem = () => {
                         ].map((feature, index) => (
                             <Col key={index} md={6} className="mb-4">
                                 <motion.div
-                                    className="hk-feature-card"
+                                    className="feature-card"
                                     whileHover={{ scale: 1.03 }}
                                     transition={{ duration: 0.3 }}
                                 >
@@ -109,41 +109,31 @@ const HKManagementSystem = () => {
                     </Row>
                 </section>
 
-                <section className="hk-downloads">
+                <section className="app-downloads">
                     <h2>Téléchargement de l&apos;application</h2>
                     <p>
                         Choisissez la version qui correspond à votre usage.
                     </p>
-                    <div className="hk-download-buttons">
-                        <Button
-                            variant="primary"
-                            className="hk-download-btn hk-logo-only"
-                            as="a"
+                    <div className="download-buttons">
+                        <a 
                             href={webAppUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Ouvrir la Web App"
-                            title="Ouvrir la Web App"
+                            className="store-logo-btn"
+                            title="Web App"
                         >
-                            <img src={windowsLogo} alt="Windows" className="hk-store-logo" />
-                        </Button>
-                        <Button
-                            variant="warning"
-                            className="hk-download-btn hk-logo-only"
-                            as="a"
+                            <img src={windowsLogo} alt="Windows" className="store-logo" />
+                        </a>
+                        <a 
                             href={androidAppUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Télécharger l'App Android"
-                            title="Télécharger l'App Android"
+                            className="store-logo-btn"
+                            title="Google Play"
                         >
-                            <img src={googlePlayLogo} alt="Google Play" className="hk-store-logo" />
-                        </Button>
+                            <img src={googlePlayLogo} alt="Google Play" className="store-logo" />
+                        </a>
                     </div>
-                    <p className="hk-download-note">
-                        Configurez VITE_HK_WEB_APP_URL et VITE_HK_ANDROID_APP_URL
-                        pour pointer vers vos liens de publication.
-                    </p>
                 </section>
             </Container>
         </motion.div>
