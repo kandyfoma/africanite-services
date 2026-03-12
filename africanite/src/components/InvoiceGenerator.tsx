@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
-    Container, Row, Col, Form, Button, Card, Accordion, Badge,
+    Container, Row, Col, Form, Button, Card, Accordion, Badge, Modal,
 } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -348,9 +348,10 @@ const InvoiceGenerator: React.FC = () => {
     const [pdfDownloaded, setPdfDownloaded] = useState(false);
     const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
     const [emailRecipient, setEmailRecipient] = useState("");
-    const [senderEmail, setSenderEmail] = useState("");
+    const [senderEmail, setSenderEmail] = useState("foma.kandy@gmail.com");
     const [senderName, setSenderName] = useState("Kandy Foma");
     const [pdfBase64, setPdfBase64] = useState<string>("");
+    const [pdfSizeMB, setPdfSizeMB] = useState<number>(0);
     const [isSendingEmail, setIsSendingEmail] = useState(false);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [scheduledInvoices, setScheduledInvoices] = useState<ScheduledInvoice[]>([]);
@@ -456,26 +457,46 @@ const InvoiceGenerator: React.FC = () => {
             const html2canvas = (await import("html2canvas")).default;
             const { jsPDF } = await import("jspdf");
             const el = invoiceRef.current;
+            
+            // Use lower scale (1.5) and JPEG compression to reduce file size
             const canvas = await html2canvas(el, {
-                scale: 2,
+                scale: 1.5,
                 useCORS: true,
                 backgroundColor: "#ffffff",
                 logging: false,
                 width: el.offsetWidth,
                 height: el.scrollHeight,
             });
-            const imgData = canvas.toDataURL("image/png");
+            
+            // Use JPEG with quality setting for better compression than PNG
+            const imgData = canvas.toDataURL("image/jpeg", 0.85);
+            
             // Use custom page size matching the invoice content
             const mmPerPx = 0.264583; // 1px = 0.264583mm at 96dpi
             const pageW = el.offsetWidth * mmPerPx;
             const pageH = el.scrollHeight * mmPerPx;
             const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: [pageW, pageH] });
-            pdf.addImage(imgData, "PNG", 0, 0, pageW, pageH);
+            
+            // Add JPEG image instead of PNG for smaller file size
+            pdf.addImage(imgData, "JPEG", 0, 0, pageW, pageH);
             const pdfDataUrl = pdf.output("dataurlstring");
+            
             // Extract base64 from data URL: "data:application/pdf;base64,..."
             const base64String = pdfDataUrl.split(",")[1];
+            
+            // Calculate file size in MB
+            const binarySizeBytes = (base64String.length * 3) / 4;
+            const fileSizeMB = binarySizeBytes / (1024 * 1024);
+            setPdfSizeMB(fileSizeMB);
+            
+            // Warn if file size is large
+            if (fileSizeMB > 4) {
+                alert(`⚠️  PDF generated successfully but is quite large (${fileSizeMB.toFixed(1)}MB).\n\nThe max size for email is 5MB. You may need to simplify the invoice content if it fails to send.`);
+            }
+            
             setPdfBase64(base64String);
             pdf.save(`Invoice-INV-${formData.invoiceNumber}-${formData.invoiceDate}.pdf`);
+            
             // Persist this invoice number so the next session auto-increments
             persistInvoiceNumber(formData.invoiceNumber);
             setPdfDownloaded(true);
@@ -516,6 +537,16 @@ const InvoiceGenerator: React.FC = () => {
         if (!isValidInvoiceNumber(formData.invoiceNumber)) {
             alert("Invalid invoice number format");
             return;
+        }
+
+        // Check file size and warn if approaching limit
+        if (pdfSizeMB > 5) {
+            alert(`❌ PDF is too large (${pdfSizeMB.toFixed(1)}MB). Max: 5MB\n\nPlease download the PDF again to regenerate with optimized compression.`);
+            return;
+        }
+        
+        if (pdfSizeMB > 4.5) {
+            alert(`⚠️  PDF is quite large (${pdfSizeMB.toFixed(1)}MB) and approaching the 5MB limit.\n\nSending may fail. Consider regenerating or simplifying the invoice.`);
         }
 
         if (!pdfBase64) {
@@ -1069,7 +1100,7 @@ const InvoiceGenerator: React.FC = () => {
                         <Col lg={4}>
                             <motion.div
                                 className="sticky-top"
-                                style={{ top: "80px" }}
+                                style={{ top: "80px" } as React.CSSProperties}
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
@@ -1430,44 +1461,22 @@ const InvoiceGenerator: React.FC = () => {
             </div>
 
             {/* Email & Scheduling Section */}
-            {pdfDownloaded && showScheduleModal && (
-                <div style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 9999,
-                    padding: "20px"
-                }}>
-                    <Card style={{
-                        width: "100%",
-                        maxWidth: "600px",
-                        maxHeight: "80vh",
-                        overflowY: "auto"
-                    }}>
-                        <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: "#f8f9fa" }}>
-                            <Card.Title className="mb-0">
-                                <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                                Send Invoice
-                            </Card.Title>
-                            <button
-                                onClick={() => setShowScheduleModal(false)}
-                                style={{
-                                    border: "none",
-                                    background: "none",
-                                    fontSize: "24px",
-                                    cursor: "pointer"
-                                }}
-                            >
-                                ×
-                            </button>
-                        </Card.Header>
-                        <Card.Body>
+            <Modal
+                show={pdfDownloaded && showScheduleModal}
+                onHide={() => setShowScheduleModal(false)}
+                centered
+                size="lg"
+                className="modern-modal"
+                backdrop="static"
+                keyboard={true}
+            >
+                <Modal.Header closeButton className="border-bottom">
+                    <Modal.Title className="fw-bold">
+                        <FontAwesomeIcon icon={faEnvelope} className="me-2" style={{ color: "#0d6efd" }} />
+                        Send Invoice
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                             {/* Sender Name Input */}
                             <Form.Group className="mb-3">
                                 <Form.Label>
@@ -1493,12 +1502,12 @@ const InvoiceGenerator: React.FC = () => {
                                 </Form.Label>
                                 <Form.Control
                                     type="email"
-                                    placeholder="your-email@gmail.com"
                                     value={senderEmail}
-                                    onChange={(e) => setSenderEmail(e.target.value)}
+                                    readOnly
+                                    style={{ backgroundColor: "var(--bs-secondary-bg, #f8f9fa)", cursor: "default" }}
                                 />
                                 <Form.Text className="text-muted">
-                                    Must be the Gmail account configured in Firebase
+                                    Emails are sent from this configured Gmail account
                                 </Form.Text>
                             </Form.Group>
 
@@ -1518,6 +1527,35 @@ const InvoiceGenerator: React.FC = () => {
                                     The invoice will be sent to this email address
                                 </Form.Text>
                             </Form.Group>
+
+                            {/* PDF File Size Indicator */}
+                            {pdfDownloaded && pdfSizeMB > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="mb-3"
+                                    style={{
+                                        padding: "12px",
+                                        borderRadius: "6px",
+                                        backgroundColor: pdfSizeMB > 4.5 ? "#fff3cd" : "#d5e8d4",
+                                        border: `1px solid ${pdfSizeMB > 4.5 ? "#ffc107" : "#82b366"}`,
+                                    } as React.CSSProperties}
+                                >
+                                    <small style={{ fontSize: "0.9rem" }}>
+                                        <strong>PDF Size:</strong> {pdfSizeMB.toFixed(2)}MB / 5MB
+                                        {pdfSizeMB > 4.5 && (
+                                            <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>
+                                                ⚠️ Approaching limit - may fail to send
+                                            </span>
+                                        )}
+                                        {pdfSizeMB <= 4.5 && (
+                                            <span style={{ color: "#28a745", marginLeft: "8px" }}>
+                                                ✓ Safe to send
+                                            </span>
+                                        )}
+                                    </small>
+                                </motion.div>
+                            )}
 
                             {/* Send Now vs Schedule Toggle */}
                             <div className="mb-4">
@@ -1622,10 +1660,16 @@ const InvoiceGenerator: React.FC = () => {
                                     ))}
                                 </div>
                             )}
-                        </Card.Body>
-                    </Card>
-                </div>
-            )}
+                </Modal.Body>
+                <Modal.Footer className="border-top">
+                    <Button
+                        variant="secondary"
+                        onClick={() => setShowScheduleModal(false)}
+                    >
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

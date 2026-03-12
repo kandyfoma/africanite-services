@@ -34,6 +34,17 @@ export function escapeHtml(text: string): string {
 }
 
 /**
+ * Calculate file size in MB from base64 string
+ * @param base64 Base64 encoded string
+ * @returns Size in MB
+ */
+export function calculateBase64SizeMB(base64: string): number {
+  if (!base64 || typeof base64 !== "string") return 0;
+  const binarySize = (base64.length * 3) / 4;
+  return binarySize / (1024 * 1024);
+}
+
+/**
  * Validate base64 string and check size
  * @param base64 Base64 encoded string
  * @param maxSizeMB Maximum size in MB (default 5MB for Cloud Functions safety)
@@ -48,9 +59,8 @@ export function isValidBase64(base64: string, maxSizeMB: number = 5): { valid: b
     return { valid: false, error: "Invalid PDF data format" };
   }
 
-  // Estimate size: base64 is ~4/3 of binary size
-  const binarySize = (base64.length * 3) / 4;
-  const sizeMB = binarySize / (1024 * 1024);
+  // Calculate size using helper
+  const sizeMB = calculateBase64SizeMB(base64);
 
   if (sizeMB > maxSizeMB) {
     return { valid: false, error: `PDF is too large (${sizeMB.toFixed(1)}MB). Max: ${maxSizeMB}MB` };

@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as nodemailer from "nodemailer";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -42,32 +43,36 @@ function isValidBase64(base64: string): boolean {
 
 // ─────────────────────────────────────────────────────────────────────────
 // EMAIL CONFIGURATION
-// To use Gmail, you must:
-// 1. Enable 2-Factor Authentication on your Gmail account
-// 2. Generate an App-Specific Password: https://myaccount.google.com/apppasswords
-// 3. Set these environment variables:
-//    firebase functions:config:set gmail.email="your-email@gmail.com" gmail.password="your-app-password"
+// Credentials are loaded from functions/.env (deployed with Firebase CLI)
+// The .env file is git-ignored but Firebase CLI includes it in deployment.
 // ─────────────────────────────────────────────────────────────────────────
 
-const gmailEmail = functions.config().gmail?.email || process.env.GMAIL_EMAIL;
-const gmailPassword = functions.config().gmail?.password || process.env.GMAIL_PASSWORD;
+const gmailEmail = process.env.GMAIL_EMAIL;
+const gmailPassword = process.env.GMAIL_PASSWORD;
 
 if (!gmailEmail || !gmailPassword) {
-    console.warn("⚠️ Gmail credentials not configured. Email functions will fail. Set up environment variables.");
+    console.warn("⚠️ Gmail credentials not configured. GMAIL_EMAIL or GMAIL_PASSWORD env var is missing.");
 }
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: gmailEmail,
-        pass: gmailPassword,
-    },
-});
+// Create transporter immediately to catch issues early
+let transporter: any = null;
+try {
+    transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: gmailEmail,
+            pass: gmailPassword,
+        },
+    });
+} catch (error) {
+    console.error("❌ Failed to create Gmail transporter:", error);
+}
 
 // ─────────────────────────────────────────────────────────────────────────
 // SEND INVOICE EMAIL (Callable Function)
 // ─────────────────────────────────────────────────────────────────────────
-export const sendInvoiceEmail = functions.https.onCall(async (data, context) => {
+export const sendInvoiceEmailV2 = onCall({region: "us-central1", invoker: "public"}, async (request) => {
+    const data = request.data as any;
     const { 
         senderEmail, 
         senderName, 
@@ -81,37 +86,53 @@ export const sendInvoiceEmail = functions.https.onCall(async (data, context) => 
     } = data;
 
     // ─────── VALIDATION ───────
+    // Check if transporter is available
+    if (!transporter) {
+        throw new HttpsError("internal", "❌ Email service not configured. Gmail credentials missing.");
+    }
+
+    // Check if credentials are configured
+    if (!gmailEmail || !gmailPassword) {
+        throw new HttpsError("internal", "❌ Gmail credentials not configured. Run: firebase functions:config:set gmail.email=... gmail.password=...");
+    }
+
     if (!senderEmail || !senderName || !recipientEmail || !pdfBase64 || !invoiceNumber) {
-        throw new functions.https.HttpsError("invalid-argument", "Missing required fields");
+        throw new HttpsError("invalid-argument", "Missing required fields");
     }
 
     // Validate email formats
     if (!isValidEmail(senderEmail)) {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid sender email format");
+        throw new HttpsError("invalid-argument", "Invalid sender email format");
     }
     if (!isValidEmail(recipientEmail)) {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid recipient email format");
+        throw new HttpsError("invalid-argument", "Invalid recipient email format");
     }
 
     // Validate sender email matches configured Gmail
     if (senderEmail !== gmailEmail) {
-        throw new functions.https.HttpsError("invalid-argument", `Sender email must be ${gmailEmail}`);
+        throw new HttpsError("invalid-argument", `Sender email must be ${gmailEmail}`);
     }
 
     // Validate base64
     if (!isValidBase64(pdfBase64)) {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid PDF data format");
+        throw new HttpsError("invalid-argument", "Invalid PDF data format");
     }
 
     // Validate PDF size (<10MB for Cloud Functions limit)
     const pdfSizeMB = (pdfBase64.length * 3) / (4 * 1024 * 1024);
     if (pdfSizeMB > 10) {
-        throw new functions.https.HttpsError("invalid-argument", `PDF too large (${pdfSizeMB.toFixed(1)}MB). Max: 10MB`);
+        throw new HttpsError("invalid-argument", `PDF too large (${pdfSizeMB.toFixed(1)}MB). Max: 10MB`);
     }
 
     try {
+        // Test transporter connection
+        console.log("Testing Gmail transporter connection...");
+        await transporter.verify();
+        console.log("✅ Gmail transporter verified successfully");
+
         // Convert base64 to buffer
         const pdfBuffer = Buffer.from(pdfBase64, "base64");
+        console.log(`✓ PDF buffer created: ${pdfBuffer.length} bytes`);
 
         // Escape HTML in dynamic content
         const safeSenderName = escapeHtml(senderName);
@@ -119,6 +140,7 @@ export const sendInvoiceEmail = functions.https.onCall(async (data, context) => 
         const safeInvoiceNumber = escapeHtml(invoiceNumber);
 
         // Send email
+        console.log(`Sending email to ${recipientEmail}...`);
         const mailOptions = {
             from: gmailEmail,
             to: recipientEmail,
@@ -145,34 +167,54 @@ export const sendInvoiceEmail = functions.https.onCall(async (data, context) => 
             ],
         };
 
-        await transporter.sendMail(mailOptions);
+        const sendResult = await transporter.sendMail(mailOptions);
+        console.log(`✅ Email sent successfully. Message ID: ${sendResult.messageId}`);
 
         // Log the send
-        await db.collection("invoice_sends").add({
-            senderEmail,
-            senderName: safeSenderName,
-            recipientEmail,
-            invoiceNumber: safeInvoiceNumber,
-            sentAt: admin.firestore.FieldValue.serverTimestamp(),
-            status: "success",
-        });
+        try {
+            await db.collection("invoice_sends").add({
+                senderEmail,
+                senderName: safeSenderName,
+                recipientEmail,
+                invoiceNumber: safeInvoiceNumber,
+                sentAt: admin.firestore.FieldValue.serverTimestamp(),
+                status: "success",
+                messageId: sendResult.messageId,
+            });
+        } catch (logError) {
+            console.error("Failed to log success to Firestore:", logError);
+        }
 
-        return { success: true, message: "Invoice sent successfully" };
+        return { success: true, message: "Invoice sent successfully", messageId: sendResult.messageId };
     } catch (error) {
-        console.error("Email send error:", error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("❌ Email send error:", errorMessage, error);
 
-        // Log the failure
-        await db.collection("invoice_sends").add({
-            senderEmail,
-            senderName,
-            recipientEmail,
-            invoiceNumber,
-            sentAt: admin.firestore.FieldValue.serverTimestamp(),
-            status: "failed",
-            error: String(error),
-        });
+        // Log the failure with detailed error
+        try {
+            await db.collection("invoice_sends").add({
+                senderEmail,
+                senderName,
+                recipientEmail,
+                invoiceNumber,
+                sentAt: admin.firestore.FieldValue.serverTimestamp(),
+                status: "failed",
+                error: errorMessage,
+            });
+        } catch (logError) {
+            console.error("Failed to log error to Firestore:", logError);
+        }
 
-        throw new functions.https.HttpsError("internal", "Failed to send invoice email");
+        // Return detailed error message
+        if (errorMessage.includes("Invalid login")) {
+            throw new HttpsError("unauthenticated", "❌ Invalid Gmail credentials. Check your app-specific password.");
+        } else if (errorMessage.includes("Less secure")) {
+            throw new HttpsError("unauthenticated", "❌ Gmail requires app-specific password for this account.");
+        } else if (errorMessage.includes("Too many login")) {
+            throw new HttpsError("resource-exhausted", "❌ Too many login attempts. Try again later.");
+        }
+        
+        throw new HttpsError("internal", `❌ Failed to send invoice email: ${errorMessage}`);
     }
 });
 

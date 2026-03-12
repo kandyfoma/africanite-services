@@ -33,7 +33,7 @@ export const auth = getAuth(app);
 export const functions = getFunctions(app, "us-central1");
 
 // Callable functions
-export const sendInvoiceEmail = httpsCallable(functions, "sendInvoiceEmail");
+export const sendInvoiceEmail = httpsCallable(functions, "sendInvoiceEmailV2");
 export const getScheduledInvoices = httpsCallable(functions, "getScheduledInvoices");
 export const saveScheduledInvoice = httpsCallable(functions, "saveScheduledInvoice");
 export const deleteScheduledInvoice = httpsCallable(functions, "deleteScheduledInvoice");
