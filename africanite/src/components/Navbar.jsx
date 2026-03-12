@@ -17,7 +17,8 @@ const NavbarComponent = () => {
         "/hk-management-system",
         "/wennze",
         "/goshopper",
-        "/qrcode"
+        "/qrcode",
+        "/invoice"
     ].includes(location.pathname);
 
     return (
@@ -92,6 +93,15 @@ const NavbarComponent = () => {
                                     active={location.pathname === "/qrcode"}
                                 >
                                     QR Code Generator
+                                </NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/invoice"
+                                    onClick={handleNavClick}
+                                    active={location.pathname === "/invoice"}
+                                >
+                                    Invoice Generator
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link

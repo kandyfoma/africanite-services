@@ -8,6 +8,7 @@ import QRCode from "./components/QRCode";
 import HKManagementSystem from "./components/HKManagementSystem";
 import WennzePage from "./components/WennzePage";
 import GoShopperPage from "./components/GoShopperPage";
+import InvoiceGenerator from "./components/InvoiceGenerator";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import PrivacyPolicy from "./components/PrivacyPolicy";
@@ -31,6 +32,7 @@ const App: React.FC = () => {
                         <Route path="/wennze" element={<WennzePage />} />
                         <Route path="/goshopper" element={<GoShopperPage />} />
                         <Route path="/qrcode" element={<QRCode />} />
+                        <Route path="/invoice" element={<InvoiceGenerator />} />
                     </Routes>
                 </main>
                 <Footer />
