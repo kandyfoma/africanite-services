@@ -9,9 +9,11 @@ import {
     faCalculator, faUser, faCalendarDays, faClock,
     faTag, faFileInvoiceDollar, faMoneyBillWave,
     faCheck, faTimes, faMagicWandSparkles,
-    faUniversity, faPalette,
+    faUniversity, faPalette, faEnvelope, faPaperPlane,
+    faClock as faClockRegular, faCheckCircle, faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import "../styles/Invoice.css";
+import { sendInvoiceNow, scheduleInvoice, getScheduledInvoicesList, deleteScheduledInvoiceById, ScheduledInvoice, InvoiceEmailData, isValidEmail, isValidInvoiceNumber, isValidFutureDate } from "../services/emailService";
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -345,6 +347,15 @@ const InvoiceGenerator: React.FC = () => {
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [pdfDownloaded, setPdfDownloaded] = useState(false);
     const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+    const [emailRecipient, setEmailRecipient] = useState("");
+    const [senderEmail, setSenderEmail] = useState("");
+    const [senderName, setSenderName] = useState("Kandy Foma");
+    const [pdfBase64, setPdfBase64] = useState<string>("");
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [scheduledInvoices, setScheduledInvoices] = useState<ScheduledInvoice[]>([]);
+    const [scheduleRecurrence, setScheduleRecurrence] = useState<"monthly" | "quarterly" | "yearly">("monthly");
+    const [sendDebounce, setSendDebounce] = useState(false);
     const invoiceRef = useRef<HTMLDivElement>(null);
 
     // ── Auto-save draft on every form change ──
@@ -460,6 +471,10 @@ const InvoiceGenerator: React.FC = () => {
             const pageH = el.scrollHeight * mmPerPx;
             const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: [pageW, pageH] });
             pdf.addImage(imgData, "PNG", 0, 0, pageW, pageH);
+            const pdfDataUrl = pdf.output("dataurlstring");
+            // Extract base64 from data URL: "data:application/pdf;base64,..."
+            const base64String = pdfDataUrl.split(",")[1];
+            setPdfBase64(base64String);
             pdf.save(`Invoice-INV-${formData.invoiceNumber}-${formData.invoiceDate}.pdf`);
             // Persist this invoice number so the next session auto-increments
             persistInvoiceNumber(formData.invoiceNumber);
@@ -469,6 +484,137 @@ const InvoiceGenerator: React.FC = () => {
             alert("Could not generate PDF. Please try again.");
         } finally {
             setIsGeneratingPDF(false);
+        }
+    };
+
+    const handleSendEmail = async () => {
+        // Debounce to prevent double-sends
+        if (sendDebounce) {
+            alert("Please wait while the invoice is being sent...");
+            return;
+        }
+
+        // Validate sender name
+        if (!senderName.trim()) {
+            alert("Please enter your name");
+            return;
+        }
+
+        // Validate sender email format
+        if (!isValidEmail(senderEmail)) {
+            alert("Please enter a valid sender email address");
+            return;
+        }
+
+        // Validate recipient email format
+        if (!isValidEmail(emailRecipient)) {
+            alert("Please enter a valid recipient email address");
+            return;
+        }
+
+        // Validate invoice number
+        if (!isValidInvoiceNumber(formData.invoiceNumber)) {
+            alert("Invalid invoice number format");
+            return;
+        }
+
+        if (!pdfBase64) {
+            alert("Please download the PDF first");
+            return;
+        }
+
+        setSendDebounce(true);
+        setIsSendingEmail(true);
+        try {
+            const emailData: InvoiceEmailData = {
+                senderEmail: senderEmail,
+                senderName: senderName,
+                recipientEmail: emailRecipient,
+                invoiceNumber: formData.invoiceNumber,
+                invoiceDate: formData.invoiceDate,
+                dueDate: formData.dueDate,
+                totalAmount: totalAmount,
+                clientName: client.company,
+                pdfBase64: pdfBase64,
+            };
+            const result = await sendInvoiceNow(emailData);
+            if (result.success) {
+                alert("Invoice sent successfully!");
+                setEmailRecipient("");
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error("Email send error:", error);
+            alert("Failed to send invoice. Please check your connection or contact support.");
+        } finally {
+            setIsSendingEmail(false);
+            setSendDebounce(false);
+        }
+    };
+
+    const handleScheduleInvoice = async () => {
+        // Validate email
+        if (!isValidEmail(emailRecipient)) {
+            alert("Please enter a valid recipient email address");
+            return;
+        }
+
+        // Calculate next month date
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const nextSendDate = nextMonth.toISOString().split("T")[0];
+
+        // Validate future date
+        const dateValidation = isValidFutureDate(nextSendDate);
+        if (!dateValidation.valid) {
+            alert(dateValidation.error || "Invalid schedule date");
+            return;
+        }
+
+        setIsSendingEmail(true);
+        try {
+            const scheduled: ScheduledInvoice = {
+                invoiceNumber: formData.invoiceNumber,
+                clientEmail: emailRecipient,
+                clientName: client.company,
+                recurringType: scheduleRecurrence,
+                nextSendDate: nextSendDate,
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                totalAmount: totalAmount,
+            };
+            const result = await scheduleInvoice(scheduled);
+            if (result.success) {
+                alert(`Invoice scheduled to send ${scheduleRecurrence}ly starting ${new Date(nextSendDate).toLocaleDateString()}!`);
+                setShowScheduleModal(false);
+                setEmailRecipient("");
+                loadScheduledInvoices();
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error("Schedule error:", error);
+            alert("Failed to schedule invoice.");
+        } finally {
+            setIsSendingEmail(false);
+        }
+    };
+
+    const loadScheduledInvoices = async () => {
+        const invoices = await getScheduledInvoicesList();
+        setScheduledInvoices(invoices);
+    };
+
+    const handleDeleteScheduled = async (id: string | undefined) => {
+        if (!id) return;
+        if (!window.confirm("Delete this scheduled invoice?")) return;
+        
+        const result = await deleteScheduledInvoiceById(id);
+        if (result.success) {
+            loadScheduledInvoices();
+        } else {
+            alert(result.message);
         }
     };
 
@@ -1035,7 +1181,7 @@ const InvoiceGenerator: React.FC = () => {
                                 </button>
                             ))}
                         </div>
-                        <div className="d-flex gap-2 align-items-center">
+                        <div className="d-flex gap-2 align-items-center flex-wrap">
                             {pdfDownloaded && (
                                 <span className="inv-next-hint">
                                     Next invoice will be INV-{String(parseInt(formData.invoiceNumber, 10) + 1).padStart(3, "0")}
@@ -1046,10 +1192,20 @@ const InvoiceGenerator: React.FC = () => {
                                 Edit
                             </Button>
                             {pdfDownloaded ? (
-                                <Button className="inv-new-btn" onClick={handleNewInvoice}>
-                                    <FontAwesomeIcon icon={faPlus} className="me-2" />
-                                    New Invoice
-                                </Button>
+                                <>
+                                    <Button className="inv-new-btn" onClick={handleNewInvoice}>
+                                        <FontAwesomeIcon icon={faPlus} className="me-2" />
+                                        New Invoice
+                                    </Button>
+                                    <Button 
+                                        variant="success" 
+                                        onClick={() => setShowScheduleModal(true)}
+                                        title="Send now or schedule for future months"
+                                    >
+                                        <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                                        Send Email
+                                    </Button>
+                                </>
                             ) : (
                                 <Button
                                     className="inv-dl-btn"
@@ -1272,6 +1428,204 @@ const InvoiceGenerator: React.FC = () => {
                     {theme === "obsidian" && <div className="ob-footer-bar" />}
                 </div>
             </div>
+
+            {/* Email & Scheduling Section */}
+            {pdfDownloaded && showScheduleModal && (
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 9999,
+                    padding: "20px"
+                }}>
+                    <Card style={{
+                        width: "100%",
+                        maxWidth: "600px",
+                        maxHeight: "80vh",
+                        overflowY: "auto"
+                    }}>
+                        <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: "#f8f9fa" }}>
+                            <Card.Title className="mb-0">
+                                <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                                Send Invoice
+                            </Card.Title>
+                            <button
+                                onClick={() => setShowScheduleModal(false)}
+                                style={{
+                                    border: "none",
+                                    background: "none",
+                                    fontSize: "24px",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                ×
+                            </button>
+                        </Card.Header>
+                        <Card.Body>
+                            {/* Sender Name Input */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    <FontAwesomeIcon icon={faUser} className="me-2" />
+                                    Your Name (Sender)
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Kandy Foma"
+                                    value={senderName}
+                                    onChange={(e) => setSenderName(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">
+                                    This name will appear in the email signature
+                                </Form.Text>
+                            </Form.Group>
+
+                            {/* Sender Email Input */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                                    Your Email (Sender)
+                                </Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    placeholder="your-email@gmail.com"
+                                    value={senderEmail}
+                                    onChange={(e) => setSenderEmail(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">
+                                    Must be the Gmail account configured in Firebase
+                                </Form.Text>
+                            </Form.Group>
+
+                            {/* Recipient Email Input */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                                    Recipient Email
+                                </Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    placeholder="client@example.com"
+                                    value={emailRecipient}
+                                    onChange={(e) => setEmailRecipient(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">
+                                    The invoice will be sent to this email address
+                                </Form.Text>
+                            </Form.Group>
+
+                            {/* Send Now vs Schedule Toggle */}
+                            <div className="mb-4">
+                                <h5>Send Options</h5>
+                                <div style={{ display: "flex", gap: "10px" }}>
+                                    <Button
+                                        variant="success"
+                                        onClick={handleSendEmail}
+                                        disabled={isSendingEmail || sendDebounce || !emailRecipient.trim() || !senderEmail.trim() || !senderName.trim()}
+                                        style={{ flex: 1 }}
+                                    >
+                                        <FontAwesomeIcon icon={faPaperPlane} className="me-2" />
+                                        {isSendingEmail ? "Sending..." : "Send Now"}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Recurring Schedule Section */}
+                            <Accordion defaultActiveKey="0">
+                                <Accordion.Item eventKey="1">
+                                    <Accordion.Header>
+                                        <FontAwesomeIcon icon={faClockRegular} className="me-2" />
+                                        Schedule for Future Months
+                                    </Accordion.Header>
+                                    <Accordion.Body>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Recurring Frequency</Form.Label>
+                                            <div style={{ display: "flex", gap: "10px" }}>
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="recur-monthly"
+                                                    label="Monthly"
+                                                    value="monthly"
+                                                    checked={scheduleRecurrence === "monthly"}
+                                                    onChange={(e) => setScheduleRecurrence(e.target.value as any)}
+                                                />
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="recur-quarterly"
+                                                    label="Quarterly"
+                                                    value="quarterly"
+                                                    checked={scheduleRecurrence === "quarterly"}
+                                                    onChange={(e) => setScheduleRecurrence(e.target.value as any)}
+                                                />
+                                                <Form.Check
+                                                    type="radio"
+                                                    id="recur-yearly"
+                                                    label="Yearly"
+                                                    value="yearly"
+                                                    checked={scheduleRecurrence === "yearly"}
+                                                    onChange={(e) => setScheduleRecurrence(e.target.value as any)}
+                                                />
+                                            </div>
+                                            <Form.Text className="text-muted" style={{ display: "block", marginTop: "10px" }}>
+                                                Invoice will be automatically sent every {scheduleRecurrence === "quarterly" ? "3 months" : scheduleRecurrence === "yearly" ? "12 months" : "month"} starting next month
+                                            </Form.Text>
+                                        </Form.Group>
+                                        <Button
+                                            variant="info"
+                                            onClick={handleScheduleInvoice}
+                                            disabled={isSendingEmail || !emailRecipient.trim()}
+                                            style={{ width: "100%" }}
+                                        >
+                                            <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                            {isSendingEmail ? "Scheduling..." : "Schedule"}
+                                        </Button>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            </Accordion>
+
+                            {/* Scheduled Invoices List */}
+                            {scheduledInvoices.length > 0 && (
+                                <div style={{ marginTop: "30px", paddingTop: "20px", borderTop: "1px solid #dee2e6" }}>
+                                    <h5 className="mb-3">
+                                        <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                        Active Scheduled Invoices
+                                    </h5>
+                                    {scheduledInvoices.map((inv) => (
+                                        <Card key={inv.id} className="mb-2" style={{ background: "#f8f9fa" }}>
+                                            <Card.Body style={{ padding: "12px" }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                                                    <strong>{inv.clientName}</strong>
+                                                    <Badge bg="info">{inv.recurringType}</Badge>
+                                                </div>
+                                                <small style={{ color: "#666", display: "block", marginBottom: "4px" }}>
+                                                    {inv.clientEmail}
+                                                </small>
+                                                <small style={{ color: "#666", display: "block", marginBottom: "8px" }}>
+                                                    Next send: {new Date(inv.nextSendDate).toLocaleDateString()}
+                                                </small>
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
+                                                    onClick={() => handleDeleteScheduled(inv.id)}
+                                                    style={{ width: "100%" }}
+                                                >
+                                                    <FontAwesomeIcon icon={faTrash} className="me-2" />
+                                                    Remove
+                                                </Button>
+                                            </Card.Body>
+                                        </Card>
+                                    ))}
+                                </div>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 };
