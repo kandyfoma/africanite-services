@@ -148,16 +148,28 @@ const DEFAULT_BANK: BankInfo = {
 
 function buildDefaultFormData(): InvoiceFormData {
     const today = new Date();
-    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    // Auto-adjust service period based on 25th-to-25th pay cycle
+    let startDate: Date;
+    let endDate: Date;
+    if (today.getDate() <= 25) {
+        // Before or on 25th: period is 25th of last month to 25th of this month
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 25);
+        endDate = new Date(today.getFullYear(), today.getMonth(), 25);
+    } else {
+        // After 25th: period is 25th of this month to 25th of next month
+        startDate = new Date(today.getFullYear(), today.getMonth(), 25);
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 25);
+    }
+    
     const due = new Date(today);
     due.setMonth(due.getMonth() + 1);
     return {
         invoiceNumber: getNextInvoiceNumber(),
         invoiceDate: today.toISOString().split("T")[0],
         dueDate: due.toISOString().split("T")[0],
-        startDate: firstOfMonth.toISOString().split("T")[0],
-        endDate: lastOfMonth.toISOString().split("T")[0],
+        startDate: startDate.toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0],
         hourlyRate: 650,
         hoursPerDay: 8,
         serviceDescription: "Consulting Services",
