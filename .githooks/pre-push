@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# This hook prevents pushing if there are potential secrets
+# Checks commits that haven't been pushed yet
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo "🔍 Running pre-push secret detection..."
+
+# Get the range of commits to check
+remote="$1"
+url="$2"
+
+echo "Checking commits for secrets before pushing..."
+
+# Check if we can access gitleaks
+if command -v gitleaks &> /dev/null; then
+    echo "Using gitleaks for detection..."
+    gitleaks detect --source . --verbose --exit-code 1
+    
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Secrets detected! Push blocked.${NC}"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠️  gitleaks not installed. Consider installing it for better detection.${NC}"
+    echo "   Install: npm install -g gitleaks"
+fi
+
+echo "✅ Push check passed!"
+exit 0

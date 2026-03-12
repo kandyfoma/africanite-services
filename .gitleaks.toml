@@ -1,0 +1,76 @@
+# Configuration for detecting secrets and sensitive data
+# This file works with tools like 'gitleaks' and other secret detection tools
+
+title = "Africanite Services - Secret Detection Rules"
+
+# Firebase API Key patterns
+[[rules]]
+id = "firebase-api-key"
+description = "Firebase API Key"
+regex = '''AIzaSy[a-zA-Z0-9\-_]{35}'''
+entropy = 3.5
+keywords = ["firebase", "apikey"]
+
+# Firebase Database URL
+[[rules]]
+id = "firebase-database-url"
+description = "Firebase Database URL"
+regex = '''https://[a-zA-Z0-9-]+\.firebaseio\.com'''
+
+# Firebase Project ID
+[[rules]]
+id = "firebase-measurement-id"
+description = "Firebase Measurement ID"
+regex = '''G-[A-Z0-9]{10}'''
+
+# Generic API Key patterns
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)api[_-]?key["\']?\s*[:=]\s*["\']([A-Za-z0-9\-._~%!$&\'()*+,;=:@]{20,})'''
+entropy = 3.5
+
+# AWS Access Key ID
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+
+# Generic password patterns
+[[rules]]
+id = "password-pattern"
+description = "Password in code"
+regex = '''(?i)password["\']?\s*[:=]\s*["\']([^"\']{8,})'''
+
+# Gmail App Password
+[[rules]]
+id = "gmail-app-password"
+description = "Gmail App-specific password"
+regex = '''[a-z]{4}\s[a-z]{4}\s[a-z]{4}\s[a-z]{4}'''
+entropy = 4.0
+
+# Private key patterns
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA|DSA|EC|PGP|OPENSSH) PRIVATE KEY-----'''
+
+# JWT Token patterns
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''ey[A-Za-z0-9_-]{10,}\.ey[A-Za-z0-9_-]{10,}\.[\w\-]{10,}'''
+
+# Service Account Key
+[[rules]]
+id = "service-account-key"
+description = "Service Account Key"
+regex = '''"type": "service_account"'''
+
+# Environment variable fallback patterns
+[[rules]]
+id = "env-credentials"
+description = "Credentials in .env files"
+regex = '''(?i)(password|api_key|secret|token|credentials)["\']?\s*[:=]\s*["\']?[^\n"\']+'''
+path = '''\.env'''
+entropy = 3.0
