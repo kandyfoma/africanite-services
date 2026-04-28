@@ -65,8 +65,8 @@ interface InvoiceFormData {
 const DEFAULT_PROVIDER: ProviderInfo = {
     name: "Kandy Foma",
     company: "",
-    address1: "10 David Street, Alberton",
-    address2: "Johannesburg, South Africa",
+    address1: "02 Esther, Gold Maisha, Lubumbashi, 0001",
+    address2: "Democratic Republic of Congo",
 };
 
 // ─────────────────────────────────────────────
