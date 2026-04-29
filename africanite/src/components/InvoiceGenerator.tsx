@@ -81,11 +81,72 @@ const THEMES: { id: InvoiceTheme; label: string; accent: string; bg: string }[] 
 ];
 
 // ─────────────────────────────────────────────
+// CURRENCY & INVOICE LANGUAGE
+// ─────────────────────────────────────────────
+type InvoiceCurrency = "ZAR" | "USD" | "EUR" | "CDF";
+
+const CURRENCIES: { id: InvoiceCurrency; symbol: string; name: string }[] = [
+    { id: "ZAR", symbol: "R",  name: "Rand Sud-Africain (ZAR)" },
+    { id: "USD", symbol: "$",  name: "Dollar Américain (USD)" },
+    { id: "EUR", symbol: "€",  name: "Euro (EUR)" },
+    { id: "CDF", symbol: "FC", name: "Franc Congolais (CDF)" },
+];
+
+function getCurrencySymbol(c: InvoiceCurrency): string {
+    return CURRENCIES.find((x) => x.id === c)?.symbol ?? "R";
+}
+
+type InvoiceLanguage = "en" | "fr";
+
+const PAPER_LABELS = {
+    en: {
+        invoice: "INVOICE", invoiceHash: "Invoice #", invoiceDate: "Invoice Date",
+        dueDate: "Due Date", status: "Status", unpaid: "UNPAID",
+        billTo: "BILL TO", vatReg: "VAT Registration No", vat: "VAT",
+        description: "DESCRIPTION", servicePeriod: "SERVICE PERIOD",
+        qty: "QTY", unitPrice: "UNIT PRICE", amount: "AMOUNT",
+        workingDays: "Working Days", publicHolidays: "Public Holidays",
+        billableDays: "Billable Days", to: "to",
+        holidaysDeducted: "PUBLIC HOLIDAYS DEDUCTED WITHIN PERIOD",
+        publicHoliday: "Public Holiday",
+        subtotal: "Subtotal", vatZero: "VAT (0%)", totalDue: "TOTAL DUE",
+        paymentDetails: "PAYMENT DETAILS", accountName: "Account Name",
+        bankName: "Bank Name", accountNumber: "Account Number",
+        swiftCode: "SWIFT / BIC Code", bankAddress: "Bank Address",
+        notesTerms: "NOTES & TERMS",
+        thanks: "Thank you for your business!",
+        date: "Date", due: "Due",
+    },
+    fr: {
+        invoice: "FACTURE", invoiceHash: "Facture N°", invoiceDate: "Date de Facture",
+        dueDate: "Date d'Échéance", status: "Statut", unpaid: "IMPAYÉ",
+        billTo: "FACTURER À", vatReg: "N° TVA", vat: "TVA",
+        description: "DESCRIPTION", servicePeriod: "PÉRIODE DE SERVICE",
+        qty: "QTÉ", unitPrice: "PRIX UNITAIRE", amount: "MONTANT",
+        workingDays: "Jours Ouvrables", publicHolidays: "Jours Fériés",
+        billableDays: "Jours Facturables", to: "au",
+        holidaysDeducted: "JOURS FÉRIÉS DÉDUITS DANS LA PÉRIODE",
+        publicHoliday: "Jour Férié",
+        subtotal: "Sous-total", vatZero: "TVA (0%)", totalDue: "TOTAL DÛ",
+        paymentDetails: "DÉTAILS DE PAIEMENT", accountName: "Nom du Compte",
+        bankName: "Nom de la Banque", accountNumber: "Numéro de Compte",
+        swiftCode: "Code SWIFT / BIC", bankAddress: "Adresse de la Banque",
+        notesTerms: "NOTES & CONDITIONS",
+        thanks: "Merci pour votre confiance !",
+        date: "Date", due: "Échéance",
+    },
+} as const;
+
+// ─────────────────────────────────────────────
 // LOCALSTORAGE — INVOICE NUMBER TRACKING
 // ─────────────────────────────────────────────
 const LS_INVOICE_KEY = "africanite_invoice_seq";
 const LS_BANK_KEY    = "africanite_bank_details";
 const LS_DRAFT_KEY   = "africanite_invoice_draft";
+const LS_PROVIDER_KEY = "africanite_provider";
+const LS_CLIENT_KEY   = "africanite_client";
+const LS_CURRENCY_KEY = "africanite_currency";
+const LS_LANGUAGE_KEY = "africanite_inv_language";
 
 function getNextInvoiceNumber(): string {
     try {
@@ -117,6 +178,30 @@ function persistBank(b: BankInfo): void {
     try { localStorage.setItem(LS_BANK_KEY, JSON.stringify(b)); } catch { /* ignore */ }
 }
 
+function loadProvider(): ProviderInfo {
+    try {
+        const s = localStorage.getItem(LS_PROVIDER_KEY);
+        if (s) return JSON.parse(s) as ProviderInfo;
+    } catch { /* ignore */ }
+    return DEFAULT_PROVIDER;
+}
+
+function persistProvider(p: ProviderInfo): void {
+    try { localStorage.setItem(LS_PROVIDER_KEY, JSON.stringify(p)); } catch { /* ignore */ }
+}
+
+function loadClient(): ClientInfo {
+    try {
+        const s = localStorage.getItem(LS_CLIENT_KEY);
+        if (s) return JSON.parse(s) as ClientInfo;
+    } catch { /* ignore */ }
+    return DEFAULT_CLIENT;
+}
+
+function persistClient(c: ClientInfo): void {
+    try { localStorage.setItem(LS_CLIENT_KEY, JSON.stringify(c)); } catch { /* ignore */ }
+}
+
 function loadDraft(): InvoiceFormData {
     try {
         const s = localStorage.getItem(LS_DRAFT_KEY);
@@ -132,6 +217,20 @@ function persistDraft(data: InvoiceFormData): void {
 function clearDraft(): void {
     try { localStorage.removeItem(LS_DRAFT_KEY); } catch { /* ignore */ }
 }
+
+const PROVIDER_LABELS: Record<string, string> = {
+    name: "Nom",
+    company: "Société",
+    address1: "Adresse 1",
+    address2: "Adresse 2",
+};
+
+const CLIENT_LABELS: Record<string, string> = {
+    company: "Société",
+    vatNumber: "N° TVA",
+    address1: "Adresse 1",
+    address2: "Adresse 2",
+};
 
 const DEFAULT_CLIENT: ClientInfo = {
     company: "GANITECH (PTY) LTD",
@@ -174,9 +273,9 @@ function buildDefaultFormData(): InvoiceFormData {
         endDate: endDate.toISOString().split("T")[0],
         hourlyRate: 650,
         hoursPerDay: 8,
-        serviceDescription: "Consulting Services",
+        serviceDescription: "Services de Consultation",
         publicHolidays: [],
-        notes: "Payment is due within 30 days of the invoice date.",
+        notes: "Le paiement est dû dans les 30 jours suivant la date de facturation.",
     };
 }
 
@@ -314,15 +413,16 @@ function countHolidayWeekdays(holidays: PublicHoliday[], start: string, end: str
 
 function formatDateLong(dateStr: string): string {
     if (!dateStr) return "";
-    return new Date(dateStr + "T00:00:00").toLocaleDateString("en-ZA", {
+    return new Date(dateStr + "T00:00:00").toLocaleDateString("fr-FR", {
         day: "numeric",
         month: "long",
         year: "numeric",
     });
 }
 
-function formatCurrency(amount: number): string {
-    return `R\u00a0${amount.toLocaleString("en-ZA", {
+function formatCurrency(amount: number, cur: InvoiceCurrency = "ZAR"): string {
+    const csym = getCurrencySymbol(cur);
+    return `${csym}\u00a0${amount.toLocaleString("fr-FR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })}`;
@@ -338,11 +438,19 @@ function uid(): string {
 const InvoiceGenerator: React.FC = () => {
     const [view, setView] = useState<"form" | "preview">("form");
     const [formData, setFormData] = useState<InvoiceFormData>(loadDraft);
-    const [provider, setProvider] = useState<ProviderInfo>(DEFAULT_PROVIDER);
-    const [client, setClient] = useState<ClientInfo>(DEFAULT_CLIENT);
+    const [provider, setProvider] = useState<ProviderInfo>(loadProvider);
+    const [client, setClient] = useState<ClientInfo>(loadClient);
     const [bank, setBank] = useState<BankInfo>(loadBank);
     const [bankSaved, setBankSaved] = useState(false);
     const [theme, setTheme] = useState<InvoiceTheme>("classic");
+    const [currency, setCurrency] = useState<InvoiceCurrency>(() => {
+        try { const s = localStorage.getItem(LS_CURRENCY_KEY); if (s && CURRENCIES.some((c) => c.id === s)) return s as InvoiceCurrency; } catch {}
+        return "ZAR";
+    });
+    const [invoiceLanguage, setInvoiceLanguage] = useState<InvoiceLanguage>(() => {
+        try { const s = localStorage.getItem(LS_LANGUAGE_KEY); if (s === "en" || s === "fr") return s; } catch {}
+        return "en";
+    });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [pdfDownloaded, setPdfDownloaded] = useState(false);
@@ -361,6 +469,19 @@ const InvoiceGenerator: React.FC = () => {
 
     // ── Auto-save draft on every form change ──
     useEffect(() => { persistDraft(formData); }, [formData]);
+
+    // ── Auto-save provider & client on change ──
+    useEffect(() => { persistProvider(provider); }, [provider]);
+    useEffect(() => { persistClient(client); }, [client]);
+
+    // ── Persist currency & language ──
+    useEffect(() => { try { localStorage.setItem(LS_CURRENCY_KEY, currency); } catch {} }, [currency]);
+    useEffect(() => { try { localStorage.setItem(LS_LANGUAGE_KEY, invoiceLanguage); } catch {} }, [invoiceLanguage]);
+
+    // ── Computed helpers ──
+    const sym = getCurrencySymbol(currency);
+    const fmt = (amount: number) => formatCurrency(amount, currency);
+    const L = PAPER_LABELS[invoiceLanguage];
 
     // ── SA Holiday suggestions ────────────────
     const allSuggestions = useMemo(
@@ -424,22 +545,30 @@ const InvoiceGenerator: React.FC = () => {
 
     const validate = (): boolean => {
         const e: Record<string, string> = {};
-        if (!formData.invoiceNumber.trim()) e.invoiceNumber = "Invoice number is required";
-        if (!formData.invoiceDate) e.invoiceDate = "Invoice date is required";
-        if (!formData.dueDate) e.dueDate = "Due date is required";
-        if (!formData.startDate) e.startDate = "Start date is required";
-        if (!formData.endDate) e.endDate = "End date is required";
+        if (!formData.invoiceNumber.trim()) e.invoiceNumber = "Le numéro de facture est requis";
+        if (!formData.invoiceDate) e.invoiceDate = "La date de facture est requise";
+        if (!formData.dueDate) e.dueDate = "La date d'échéance est requise";
+        if (!formData.startDate) e.startDate = "La date de début est requise";
+        if (!formData.endDate) e.endDate = "La date de fin est requise";
         if (formData.startDate && formData.endDate && formData.startDate > formData.endDate)
-            e.endDate = "End date must be after start date";
+            e.endDate = "La date de fin doit être après la date de début";
+        if (formData.invoiceDate && formData.dueDate && formData.dueDate < formData.invoiceDate)
+            e.dueDate = "La date d'échéance doit être après la date de facture";
         if (!formData.hourlyRate || formData.hourlyRate <= 0)
-            e.hourlyRate = "Hourly rate must be greater than 0";
+            e.hourlyRate = "Le taux horaire doit être supérieur à 0";
         if (!formData.hoursPerDay || formData.hoursPerDay <= 0)
-            e.hoursPerDay = "Hours per day must be greater than 0";
+            e.hoursPerDay = "Les heures par jour doivent être supérieures à 0";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
 
-    const handlePreview = () => { if (validate()) { setView("preview"); setPdfDownloaded(false); } };
+    const handlePreview = () => {
+        if (validate()) {
+            setView("preview");
+            setPdfDownloaded(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
 
     const handleNewInvoice = () => {
         clearDraft();
@@ -448,6 +577,7 @@ const InvoiceGenerator: React.FC = () => {
         setErrors({});
         setDismissedSuggestions(new Set());
         setView("form");
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const handleDownloadPDF = async () => {
@@ -502,7 +632,7 @@ const InvoiceGenerator: React.FC = () => {
             setPdfDownloaded(true);
         } catch (err) {
             console.error("PDF generation error:", err);
-            alert("Could not generate PDF. Please try again.");
+            alert("Impossible de générer le PDF. Veuillez réessayer.");
         } finally {
             setIsGeneratingPDF(false);
         }
@@ -511,46 +641,46 @@ const InvoiceGenerator: React.FC = () => {
     const handleSendEmail = async () => {
         // Debounce to prevent double-sends
         if (sendDebounce) {
-            alert("Please wait while the invoice is being sent...");
+            alert("Veuillez patienter pendant l'envoi de la facture...");
             return;
         }
 
         // Validate sender name
         if (!senderName.trim()) {
-            alert("Please enter your name");
+            alert("Veuillez entrer votre nom");
             return;
         }
 
         // Validate sender email format
         if (!isValidEmail(senderEmail)) {
-            alert("Please enter a valid sender email address");
+            alert("Veuillez entrer une adresse email d'expéditeur valide");
             return;
         }
 
         // Validate recipient email format
         if (!isValidEmail(emailRecipient)) {
-            alert("Please enter a valid recipient email address");
+            alert("Veuillez entrer une adresse email de destinataire valide");
             return;
         }
 
         // Validate invoice number
         if (!isValidInvoiceNumber(formData.invoiceNumber)) {
-            alert("Invalid invoice number format");
+            alert("Format de numéro de facture invalide");
             return;
         }
 
         // Check file size and warn if approaching limit
         if (pdfSizeMB > 5) {
-            alert(`❌ PDF is too large (${pdfSizeMB.toFixed(1)}MB). Max: 5MB\n\nPlease download the PDF again to regenerate with optimized compression.`);
+            alert(`❌ Le PDF est trop volumineux (${pdfSizeMB.toFixed(1)}MB). Max : 5MB\n\nVeuillez retélécharger le PDF pour régénérer avec une compression optimisée.`);
             return;
         }
         
         if (pdfSizeMB > 4.5) {
-            alert(`⚠️  PDF is quite large (${pdfSizeMB.toFixed(1)}MB) and approaching the 5MB limit.\n\nSending may fail. Consider regenerating or simplifying the invoice.`);
+            alert(`⚠️  Le PDF est assez volumineux (${pdfSizeMB.toFixed(1)}MB) et approche la limite de 5MB.\n\nL'envoi pourrait échouer. Envisagez de régénérer ou simplifier la facture.`);
         }
 
         if (!pdfBase64) {
-            alert("Please download the PDF first");
+            alert("Veuillez d'abord télécharger le PDF");
             return;
         }
 
@@ -570,14 +700,14 @@ const InvoiceGenerator: React.FC = () => {
             };
             const result = await sendInvoiceNow(emailData);
             if (result.success) {
-                alert("Invoice sent successfully!");
+                alert("Facture envoyée avec succès !");
                 setEmailRecipient("");
             } else {
                 alert(result.message);
             }
         } catch (error) {
             console.error("Email send error:", error);
-            alert("Failed to send invoice. Please check your connection or contact support.");
+            alert("Échec de l'envoi de la facture. Vérifiez votre connexion ou contactez le support.");
         } finally {
             setIsSendingEmail(false);
             setSendDebounce(false);
@@ -587,7 +717,7 @@ const InvoiceGenerator: React.FC = () => {
     const handleScheduleInvoice = async () => {
         // Validate email
         if (!isValidEmail(emailRecipient)) {
-            alert("Please enter a valid recipient email address");
+            alert("Veuillez entrer une adresse email de destinataire valide");
             return;
         }
 
@@ -599,7 +729,7 @@ const InvoiceGenerator: React.FC = () => {
         // Validate future date
         const dateValidation = isValidFutureDate(nextSendDate);
         if (!dateValidation.valid) {
-            alert(dateValidation.error || "Invalid schedule date");
+            alert(dateValidation.error || "Date de planification invalide");
             return;
         }
 
@@ -617,7 +747,7 @@ const InvoiceGenerator: React.FC = () => {
             };
             const result = await scheduleInvoice(scheduled);
             if (result.success) {
-                alert(`Invoice scheduled to send ${scheduleRecurrence}ly starting ${new Date(nextSendDate).toLocaleDateString()}!`);
+                alert(`Facture planifiée pour envoi ${scheduleRecurrence === "monthly" ? "mensuel" : scheduleRecurrence === "quarterly" ? "trimestriel" : "annuel"} à partir du ${new Date(nextSendDate).toLocaleDateString("fr-FR")} !`);
                 setShowScheduleModal(false);
                 setEmailRecipient("");
                 loadScheduledInvoices();
@@ -626,7 +756,7 @@ const InvoiceGenerator: React.FC = () => {
             }
         } catch (error) {
             console.error("Schedule error:", error);
-            alert("Failed to schedule invoice.");
+            alert("Échec de la planification de la facture.");
         } finally {
             setIsSendingEmail(false);
         }
@@ -639,7 +769,7 @@ const InvoiceGenerator: React.FC = () => {
 
     const handleDeleteScheduled = async (id: string | undefined) => {
         if (!id) return;
-        if (!window.confirm("Delete this scheduled invoice?")) return;
+        if (!window.confirm("Supprimer cette facture planifiée ?")) return;
         
         const result = await deleteScheduledInvoiceById(id);
         if (result.success) {
@@ -661,8 +791,8 @@ const InvoiceGenerator: React.FC = () => {
                             <div className="inv-page-icon">
                                 <FontAwesomeIcon icon={faFileInvoiceDollar} />
                             </div>
-                            <h1 className="inv-page-title">Invoice Generator</h1>
-                            <p className="inv-page-sub">Generate professional monthly invoices in seconds</p>
+                            <h1 className="inv-page-title">Générateur de Factures</h1>
+                            <p className="inv-page-sub">Générez des factures mensuelles professionnelles en quelques secondes</p>
                         </div>
                     </motion.div>
 
@@ -675,31 +805,31 @@ const InvoiceGenerator: React.FC = () => {
                                     <Card.Body>
                                         <h5 className="inv-section-title">
                                             <FontAwesomeIcon icon={faTag} className="me-2" />
-                                            Invoice Details
+                                            Détails de la Facture
                                         </h5>
                                         <Row>
                                             <Col md={4}>
                                                 <Form.Group className="mb-3">
                                                     <Form.Label className="d-flex align-items-center gap-2">
-                                                        Invoice Number *
-                                                        <Badge bg="success" style={{ fontSize: "0.65rem", fontWeight: 600 }}>Auto-tracked</Badge>
+                                                        Numéro de Facture *
+                                                        <Badge bg="success" style={{ fontSize: "0.65rem", fontWeight: 600 }}>Suivi auto</Badge>
                                                     </Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         value={formData.invoiceNumber}
                                                         onChange={(e) => update("invoiceNumber", e.target.value)}
                                                         isInvalid={!!errors.invoiceNumber}
-                                                        placeholder="e.g. 018"
+                                                        placeholder="ex. 018"
                                                     />
                                                     <Form.Text className="text-muted" style={{ fontSize: "0.75rem" }}>
-                                                        Auto-increments after each PDF download
+                                                        Incrémentation automatique après chaque téléchargement PDF
                                                     </Form.Text>
                                                     <Form.Control.Feedback type="invalid">{errors.invoiceNumber}</Form.Control.Feedback>
                                                 </Form.Group>
                                             </Col>
                                             <Col md={4}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Invoice Date *</Form.Label>
+                                                    <Form.Label>Date de Facture *</Form.Label>
                                                     <Form.Control
                                                         type="date"
                                                         value={formData.invoiceDate}
@@ -711,7 +841,7 @@ const InvoiceGenerator: React.FC = () => {
                                             </Col>
                                             <Col md={4}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Payment Due Date *</Form.Label>
+                                                    <Form.Label>Date d'Échéance *</Form.Label>
                                                     <Form.Control
                                                         type="date"
                                                         value={formData.dueDate}
@@ -719,6 +849,33 @@ const InvoiceGenerator: React.FC = () => {
                                                         isInvalid={!!errors.dueDate}
                                                     />
                                                     <Form.Control.Feedback type="invalid">{errors.dueDate}</Form.Control.Feedback>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md={6}>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Devise</Form.Label>
+                                                    <Form.Select
+                                                        value={currency}
+                                                        onChange={(e) => setCurrency(e.target.value as InvoiceCurrency)}
+                                                    >
+                                                        {CURRENCIES.map((c) => (
+                                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                                        ))}
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Langue de la Facture</Form.Label>
+                                                    <Form.Select
+                                                        value={invoiceLanguage}
+                                                        onChange={(e) => setInvoiceLanguage(e.target.value as InvoiceLanguage)}
+                                                    >
+                                                        <option value="en">English</option>
+                                                        <option value="fr">Français</option>
+                                                    </Form.Select>
                                                 </Form.Group>
                                             </Col>
                                         </Row>
@@ -732,12 +889,12 @@ const InvoiceGenerator: React.FC = () => {
                                     <Card.Body>
                                         <h5 className="inv-section-title">
                                             <FontAwesomeIcon icon={faCalendarDays} className="me-2" />
-                                            Service Period
+                                            Période de Service
                                         </h5>
                                         <Row>
                                             <Col md={6}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Start Date *</Form.Label>
+                                                    <Form.Label>Date de Début *</Form.Label>
                                                     <Form.Control
                                                         type="date"
                                                         value={formData.startDate}
@@ -749,7 +906,7 @@ const InvoiceGenerator: React.FC = () => {
                                             </Col>
                                             <Col md={6}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>End Date *</Form.Label>
+                                                    <Form.Label>Date de Fin *</Form.Label>
                                                     <Form.Control
                                                         type="date"
                                                         value={formData.endDate}
@@ -761,12 +918,12 @@ const InvoiceGenerator: React.FC = () => {
                                             </Col>
                                         </Row>
                                         <Form.Group>
-                                            <Form.Label>Service Description</Form.Label>
+                                            <Form.Label>Description du Service</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 value={formData.serviceDescription}
                                                 onChange={(e) => update("serviceDescription", e.target.value)}
-                                                placeholder="e.g. Consulting Services"
+                                                placeholder="ex. Services de Consultation"
                                             />
                                         </Form.Group>
                                     </Card.Body>
@@ -779,14 +936,14 @@ const InvoiceGenerator: React.FC = () => {
                                     <Card.Body>
                                         <h5 className="inv-section-title">
                                             <FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />
-                                            Billing Rate
+                                            Tarification
                                         </h5>
                                         <Row>
                                             <Col md={6}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Hourly Rate (R) *</Form.Label>
+                                                    <Form.Label>Taux Horaire ({sym}) *</Form.Label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text inv-input-prefix">R</span>
+                                                        <span className="input-group-text inv-input-prefix">{sym}</span>
                                                         <Form.Control
                                                             type="number"
                                                             min="0"
@@ -801,17 +958,20 @@ const InvoiceGenerator: React.FC = () => {
                                             </Col>
                                             <Col md={6}>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Hours Per Working Day *</Form.Label>
+                                                    <Form.Label>Heures Par Jour Ouvrable *</Form.Label>
                                                     <div className="input-group">
                                                         <Form.Control
                                                             type="number"
                                                             min="1"
                                                             max="24"
                                                             value={formData.hoursPerDay}
-                                                            onChange={(e) => update("hoursPerDay", parseInt(e.target.value) || 8)}
+                                                            onChange={(e) => {
+                                                                const val = parseInt(e.target.value);
+                                                                update("hoursPerDay", isNaN(val) ? 0 : Math.min(24, Math.max(0, val)));
+                                                            }}
                                                             isInvalid={!!errors.hoursPerDay}
                                                         />
-                                                        <span className="input-group-text inv-input-suffix">hrs/day</span>
+                                                        <span className="input-group-text inv-input-suffix">h/jour</span>
                                                         <Form.Control.Feedback type="invalid">{errors.hoursPerDay}</Form.Control.Feedback>
                                                     </div>
                                                 </Form.Group>
@@ -828,16 +988,16 @@ const InvoiceGenerator: React.FC = () => {
                                         <div className="d-flex justify-content-between align-items-center mb-3">
                                             <h5 className="inv-section-title mb-0">
                                                 <FontAwesomeIcon icon={faClock} className="me-2" />
-                                                Public Holidays
+                                                Jours Fériés
                                                 {formData.publicHolidays.length > 0 && (
                                                     <Badge bg="warning" text="dark" className="ms-2">
-                                                        {formData.publicHolidays.length} deducted
+                                                        {formData.publicHolidays.length} déduit(s)
                                                     </Badge>
                                                 )}
                                             </h5>
                                             <Button variant="outline-success" size="sm" onClick={addHoliday}>
                                                 <FontAwesomeIcon icon={faPlus} className="me-1" />
-                                                Add Manual
+                                                Ajouter
                                             </Button>
                                         </div>
 
@@ -847,8 +1007,8 @@ const InvoiceGenerator: React.FC = () => {
                                                 <div className="inv-suggestions-header">
                                                     <span>
                                                         <FontAwesomeIcon icon={faMagicWandSparkles} className="me-2" />
-                                                        <strong>{pendingSuggestions.length} South African public holiday{pendingSuggestions.length > 1 ? "s" : ""}</strong>
-                                                        {" "}detected in your period — did you have these off?
+                                                        <strong>{pendingSuggestions.length} jour{pendingSuggestions.length > 1 ? "s" : ""} férié{pendingSuggestions.length > 1 ? "s" : ""} sud-africain{pendingSuggestions.length > 1 ? "s" : ""}</strong>
+                                                        {" "}détecté{pendingSuggestions.length > 1 ? "s" : ""} dans votre période — étiez-vous en congé ?
                                                     </span>
                                                     {pendingSuggestions.length > 1 && (
                                                         <Button
@@ -857,13 +1017,13 @@ const InvoiceGenerator: React.FC = () => {
                                                             onClick={approveAll}
                                                         >
                                                             <FontAwesomeIcon icon={faCheck} className="me-1" />
-                                                            Yes to all
+                                                            Oui à tous
                                                         </Button>
                                                     )}
                                                 </div>
                                                 <div className="inv-suggestions-list">
                                                     {pendingSuggestions.map((s) => {
-                                                        const dow = new Date(s.date + "T00:00:00").toLocaleDateString("en-ZA", { weekday: "long" });
+                                                        const dow = new Date(s.date + "T00:00:00").toLocaleDateString("fr-FR", { weekday: "long" });
                                                         return (
                                                             <div key={s.date} className="inv-suggestion-row">
                                                                 <div className="inv-suggestion-info">
@@ -874,18 +1034,18 @@ const InvoiceGenerator: React.FC = () => {
                                                                     <button
                                                                         className="inv-sug-btn approve"
                                                                         onClick={() => approveSuggestion(s)}
-                                                                        title="Yes, I was off — deduct this day"
+                                                                        title="Oui, j'étais en congé — déduire ce jour"
                                                                     >
                                                                         <FontAwesomeIcon icon={faCheck} className="me-1" />
-                                                                        I was off
+                                                                        En congé
                                                                     </button>
                                                                     <button
                                                                         className="inv-sug-btn dismiss"
                                                                         onClick={() => dismissSuggestion(s.date)}
-                                                                        title="No, I worked this day — ignore it"
+                                                                        title="Non, j'ai travaillé ce jour — ignorer"
                                                                     >
                                                                         <FontAwesomeIcon icon={faTimes} className="me-1" />
-                                                                        I worked
+                                                                        J'ai travaillé
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -900,8 +1060,8 @@ const InvoiceGenerator: React.FC = () => {
                                             <div className="inv-empty-holidays">
                                                 <p className="mb-0">
                                                     {formData.startDate && formData.endDate
-                                                        ? "No South African public holidays fall within your service period, or all have been reviewed. You can still add one manually."
-                                                        : "Set your service period above — SA public holidays will be suggested automatically."
+                                                        ? "Aucun jour férié sud-africain dans votre période de service, ou tous ont été examinés. Vous pouvez en ajouter un manuellement."
+                                                        : "Définissez votre période de service ci-dessus — les jours fériés sud-africains seront suggérés automatiquement."
                                                     }
                                                 </p>
                                             </div>
@@ -929,12 +1089,12 @@ const InvoiceGenerator: React.FC = () => {
                                                                 </Col>
                                                                 <Col md={6}>
                                                                     <Form.Group>
-                                                                        <Form.Label className="small fw-semibold">Holiday Name</Form.Label>
+                                                                        <Form.Label className="small fw-semibold">Nom du Jour Férié</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             size="sm"
                                                                             value={h.name}
-                                                                            placeholder="e.g. Workers Day"
+                                                                            placeholder="ex. Journée des Travailleurs"
                                                                             onChange={(e) => updateHoliday(h.id, "name", e.target.value)}
                                                                         />
                                                                     </Form.Group>
@@ -952,12 +1112,12 @@ const InvoiceGenerator: React.FC = () => {
                                                             </Row>
                                                             {isOutsidePeriod && (
                                                                 <small className="text-warning d-block mt-1">
-                                                                    ⚠ This date is outside the service period — it will not be deducted.
+                                                                    ⚠ Cette date est en dehors de la période de service — elle ne sera pas déduite.
                                                                 </small>
                                                             )}
                                                             {isWeekend && (
                                                                 <small className="text-muted d-block mt-1">
-                                                                    ℹ This falls on a weekend — no deduction applied.
+                                                                    ℹ Ce jour tombe un week-end — aucune déduction appliquée.
                                                                 </small>
                                                             )}
                                                         </div>
@@ -973,13 +1133,13 @@ const InvoiceGenerator: React.FC = () => {
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                                 <Card className="inv-card mb-4">
                                     <Card.Body>
-                                        <h5 className="inv-section-title">Notes / Payment Terms</h5>
+                                        <h5 className="inv-section-title">Notes / Conditions de Paiement</h5>
                                         <Form.Control
                                             as="textarea"
                                             rows={2}
                                             value={formData.notes}
                                             onChange={(e) => update("notes", e.target.value)}
-                                            placeholder="Payment terms, additional notes..."
+                                            placeholder="Conditions de paiement, notes supplémentaires..."
                                         />
                                     </Card.Body>
                                 </Card>
@@ -991,18 +1151,18 @@ const InvoiceGenerator: React.FC = () => {
                                     <Accordion.Item eventKey="0">
                                         <Accordion.Header>
                                             <FontAwesomeIcon icon={faUser} className="me-2" />
-                                            Provider &amp; Client Details
+                                            Prestataire &amp; Client
                                             <span className="ms-2 text-muted" style={{ fontSize: "0.8rem", fontWeight: 400 }}>
-                                                (click to edit)
+                                                (cliquer pour modifier)
                                             </span>
                                         </Accordion.Header>
                                         <Accordion.Body>
                                             <Row>
                                                 <Col md={6}>
-                                                    <h6 className="inv-party-heading">FROM — Your Details</h6>
+                                                    <h6 className="inv-party-heading">DE — Vos Coordonnées</h6>
                                                     {(["name", "company", "address1", "address2"] as (keyof ProviderInfo)[]).map((field) => (
                                                         <Form.Group className="mb-2" key={field}>
-                                                            <Form.Label className="small text-capitalize">{field.replace(/([A-Z])/g, " $1")}</Form.Label>
+                                                            <Form.Label className="small">{PROVIDER_LABELS[field]}</Form.Label>
                                                             <Form.Control
                                                                 type="text"
                                                                 size="sm"
@@ -1013,10 +1173,10 @@ const InvoiceGenerator: React.FC = () => {
                                                     ))}
                                                 </Col>
                                                 <Col md={6}>
-                                                    <h6 className="inv-party-heading">BILL TO — Client Details</h6>
+                                                    <h6 className="inv-party-heading">FACTURER À — Coordonnées Client</h6>
                                                     {(["company", "vatNumber", "address1", "address2"] as (keyof ClientInfo)[]).map((field) => (
                                                         <Form.Group className="mb-2" key={field}>
-                                                            <Form.Label className="small text-capitalize">{field.replace(/([A-Z])/g, " $1")}</Form.Label>
+                                                            <Form.Label className="small">{CLIENT_LABELS[field]}</Form.Label>
                                                             <Form.Control
                                                                 type="text"
                                                                 size="sm"
@@ -1036,39 +1196,39 @@ const InvoiceGenerator: React.FC = () => {
                                             <FontAwesomeIcon icon={faUniversity} className="me-2" />
                                             Banking Details
                                             <span className="ms-2 text-muted" style={{ fontSize: "0.8rem", fontWeight: 400 }}>
-                                                (saved in your browser)
+                                                (enregistré dans votre navigateur)
                                             </span>
                                         </Accordion.Header>
                                         <Accordion.Body>
                                             <p className="text-muted" style={{ fontSize: "0.82rem" }}>
-                                                These details appear on every invoice. Changes are saved automatically in your browser — no login needed.
+                                                Ces détails apparaissent sur chaque facture. Les modifications sont enregistrées automatiquement dans votre navigateur.
                                             </p>
                                             <Row>
                                                 <Col md={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className="small">Account Name</Form.Label>
+                                                        <Form.Label className="small">Nom du Compte</Form.Label>
                                                         <Form.Control size="sm" value={bank.accountName}
                                                             onChange={(e) => setBank((b) => ({ ...b, accountName: e.target.value }))} />
                                                     </Form.Group>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className="small">Bank Name</Form.Label>
+                                                        <Form.Label className="small">Nom de la Banque</Form.Label>
                                                         <Form.Control size="sm" value={bank.bankName}
                                                             onChange={(e) => setBank((b) => ({ ...b, bankName: e.target.value }))} />
                                                     </Form.Group>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className="small">Account Number</Form.Label>
+                                                        <Form.Label className="small">Numéro de Compte</Form.Label>
                                                         <Form.Control size="sm" value={bank.accountNumber}
                                                             onChange={(e) => setBank((b) => ({ ...b, accountNumber: e.target.value }))} />
                                                     </Form.Group>
                                                 </Col>
                                                 <Col md={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className="small">SWIFT / BIC Code</Form.Label>
+                                                        <Form.Label className="small">Code SWIFT / BIC</Form.Label>
                                                         <Form.Control size="sm" value={bank.swiftCode}
                                                             onChange={(e) => setBank((b) => ({ ...b, swiftCode: e.target.value }))} />
                                                     </Form.Group>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className="small">Bank Address</Form.Label>
+                                                        <Form.Label className="small">Adresse de la Banque</Form.Label>
                                                         <Form.Control as="textarea" rows={2} size="sm" value={bank.bankAddress}
                                                             onChange={(e) => setBank((b) => ({ ...b, bankAddress: e.target.value }))} />
                                                     </Form.Group>
@@ -1081,12 +1241,12 @@ const InvoiceGenerator: React.FC = () => {
                                                     onClick={() => { persistBank(bank); setBankSaved(true); setTimeout(() => setBankSaved(false), 3000); }}
                                                 >
                                                     <FontAwesomeIcon icon={faUniversity} className="me-1" />
-                                                    Save Banking Details
+                                                    Enregistrer
                                                 </Button>
                                                 {bankSaved && (
                                                     <span className="text-success" style={{ fontSize: "0.82rem", fontWeight: 600 }}>
                                                         <FontAwesomeIcon icon={faCheck} className="me-1" />
-                                                        Saved to your browser!
+                                                        Enregistré !
                                                     </span>
                                                 )}
                                             </div>
@@ -1108,43 +1268,43 @@ const InvoiceGenerator: React.FC = () => {
                                 <Card className="inv-summary-card">
                                     <Card.Header className="inv-summary-header">
                                         <FontAwesomeIcon icon={faCalculator} className="me-2" />
-                                        Live Invoice Summary
+                                        Résumé de la Facture
                                     </Card.Header>
                                     <Card.Body className="p-0">
                                         <div className="inv-summary-body">
                                             <div className="inv-summary-row">
-                                                <span className="inv-summary-label">Working Days</span>
+                                                <span className="inv-summary-label">Jours Ouvrables</span>
                                                 <span className="inv-summary-value">{workingDays}</span>
                                             </div>
                                             <div className="inv-summary-row holiday">
-                                                <span className="inv-summary-label">Public Holidays (deducted)</span>
+                                                <span className="inv-summary-label">Jours Fériés (déduits)</span>
                                                 <span className="inv-summary-value holiday">− {holidayDays}</span>
                                             </div>
                                             <div className="inv-summary-row separator">
-                                                <span className="inv-summary-label fw-bold">Billable Days</span>
+                                                <span className="inv-summary-label fw-bold">Jours Facturables</span>
                                                 <span className="inv-summary-value billable">{billableDays}</span>
                                             </div>
                                             <div className="inv-summary-row">
-                                                <span className="inv-summary-label">Hours per Day</span>
+                                                <span className="inv-summary-label">Heures par Jour</span>
                                                 <span className="inv-summary-value">{formData.hoursPerDay} h</span>
                                             </div>
                                             <div className="inv-summary-row">
-                                                <span className="inv-summary-label">Total Billable Hours</span>
+                                                <span className="inv-summary-label">Total Heures Facturables</span>
                                                 <span className="inv-summary-value">{billableHours} h</span>
                                             </div>
                                             <div className="inv-summary-row">
-                                                <span className="inv-summary-label">Hourly Rate</span>
-                                                <span className="inv-summary-value">R {formData.hourlyRate.toFixed(2)}</span>
+                                                <span className="inv-summary-label">Taux Horaire</span>
+                                                <span className="inv-summary-value">{sym} {formData.hourlyRate.toFixed(2)}</span>
                                             </div>
                                         </div>
                                         <div className="inv-summary-total">
-                                            <div className="inv-total-label">TOTAL INVOICE AMOUNT</div>
-                                            <div className="inv-total-value">{formatCurrency(totalAmount)}</div>
+                                            <div className="inv-total-label">MONTANT TOTAL DE LA FACTURE</div>
+                                            <div className="inv-total-value">{fmt(totalAmount)}</div>
                                         </div>
                                         <div className="p-3">
                                             <Button className="w-100 inv-preview-btn" size="lg" onClick={handlePreview}>
                                                 <FontAwesomeIcon icon={faEye} className="me-2" />
-                                                Preview Invoice
+                                                Aperçu de la Facture
                                             </Button>
                                         </div>
                                     </Card.Body>
@@ -1153,10 +1313,10 @@ const InvoiceGenerator: React.FC = () => {
                                 {/* Period info */}
                                 {formData.startDate && formData.endDate && (
                                     <div className="inv-period-info mt-3">
-                                        <div className="inv-period-label">Service Period</div>
+                                        <div className="inv-period-label">Période de Service</div>
                                         <div className="inv-period-value">
                                             {formatDateLong(formData.startDate)}
-                                            <span className="inv-period-to"> to </span>
+                                            <span className="inv-period-to"> au </span>
                                             {formatDateLong(formData.endDate)}
                                         </div>
                                     </div>
@@ -1190,10 +1350,10 @@ const InvoiceGenerator: React.FC = () => {
                 <Container>
                     <div className="inv-toolbar-inner">
                         <div className="d-flex align-items-center gap-2">
-                            <span className="inv-toolbar-title">Invoice INV-{formData.invoiceNumber}</span>
+                            <span className="inv-toolbar-title">Facture INV-{formData.invoiceNumber}</span>
                             {pdfDownloaded
-                                ? <Badge bg="success">✓ Downloaded</Badge>
-                                : <Badge bg="secondary">Preview</Badge>
+                                ? <Badge bg="success">✓ Téléchargé</Badge>
+                                : <Badge bg="secondary">Aperçu</Badge>
                             }
                         </div>
                         {/* Theme Switcher */}
@@ -1212,29 +1372,43 @@ const InvoiceGenerator: React.FC = () => {
                                 </button>
                             ))}
                         </div>
+                        <div className="inv-theme-switcher">
+                            <button
+                                className={`inv-theme-chip ${invoiceLanguage === "en" ? "active" : ""}`}
+                                style={{ "--chip-color": "#1e3a5f" } as React.CSSProperties}
+                                onClick={() => setInvoiceLanguage("en")}
+                                title="English Invoice"
+                            >EN</button>
+                            <button
+                                className={`inv-theme-chip ${invoiceLanguage === "fr" ? "active" : ""}`}
+                                style={{ "--chip-color": "#14532d" } as React.CSSProperties}
+                                onClick={() => setInvoiceLanguage("fr")}
+                                title="Facture en Français"
+                            >FR</button>
+                        </div>
                         <div className="d-flex gap-2 align-items-center flex-wrap">
                             {pdfDownloaded && (
                                 <span className="inv-next-hint">
-                                    Next invoice will be INV-{String(parseInt(formData.invoiceNumber, 10) + 1).padStart(3, "0")}
+                                    Prochaine facture : INV-{String(parseInt(formData.invoiceNumber, 10) + 1).padStart(3, "0")}
                                 </span>
                             )}
-                            <Button variant="outline-secondary" onClick={() => setView("form")}>
+                            <Button variant="outline-secondary" onClick={() => { setView("form"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                                 <FontAwesomeIcon icon={faPen} className="me-2" />
-                                Edit
+                                Modifier
                             </Button>
                             {pdfDownloaded ? (
                                 <>
                                     <Button className="inv-new-btn" onClick={handleNewInvoice}>
                                         <FontAwesomeIcon icon={faPlus} className="me-2" />
-                                        New Invoice
+                                        Nouvelle Facture
                                     </Button>
                                     <Button 
                                         variant="success" 
-                                        onClick={() => setShowScheduleModal(true)}
-                                        title="Send now or schedule for future months"
+                                        onClick={() => { setShowScheduleModal(true); loadScheduledInvoices(); }}
+                                        title="Envoyer maintenant ou planifier"
                                     >
                                         <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                                        Send Email
+                                        Envoyer par Email
                                     </Button>
                                 </>
                             ) : (
@@ -1244,7 +1418,7 @@ const InvoiceGenerator: React.FC = () => {
                                     disabled={isGeneratingPDF}
                                 >
                                     <FontAwesomeIcon icon={faFilePdf} className="me-2" />
-                                    {isGeneratingPDF ? "Generating PDF…" : "Download PDF"}
+                                    {isGeneratingPDF ? "Génération du PDF…" : "Télécharger le PDF"}
                                 </Button>
                             )}
                         </div>
@@ -1270,21 +1444,21 @@ const InvoiceGenerator: React.FC = () => {
                                 <div className="inv-from-address">{provider.address2}</div>
                             </div>
                             <div className="inv-meta-block">
-                                <div className="inv-title-word">INVOICE</div>
+                                <div className="inv-title-word">{L.invoice}</div>
                                 <table className="inv-meta-table"><tbody>
-                                    <tr><td className="inv-meta-label">Invoice #</td><td className="inv-meta-val">INV-{formData.invoiceNumber}</td></tr>
-                                    <tr><td className="inv-meta-label">Invoice Date</td><td className="inv-meta-val">{formatDateLong(formData.invoiceDate)}</td></tr>
-                                    <tr><td className="inv-meta-label">Due Date</td><td className="inv-meta-val inv-due">{formatDateLong(formData.dueDate)}</td></tr>
-                                    <tr><td className="inv-meta-label">Status</td><td className="inv-meta-val inv-status-unpaid">UNPAID</td></tr>
+                                    <tr><td className="inv-meta-label">{L.invoiceHash}</td><td className="inv-meta-val">INV-{formData.invoiceNumber}</td></tr>
+                                    <tr><td className="inv-meta-label">{L.invoiceDate}</td><td className="inv-meta-val">{formatDateLong(formData.invoiceDate)}</td></tr>
+                                    <tr><td className="inv-meta-label">{L.dueDate}</td><td className="inv-meta-val inv-due">{formatDateLong(formData.dueDate)}</td></tr>
+                                    <tr><td className="inv-meta-label">{L.status}</td><td className="inv-meta-val inv-status-unpaid">{L.unpaid}</td></tr>
                                 </tbody></table>
                             </div>
                         </div>
                         <div className="inv-rule" />
                         <div className="inv-parties">
                             <div>
-                                <div className="inv-party-tag">BILL TO</div>
+                                <div className="inv-party-tag">{L.billTo}</div>
                                 <div className="inv-party-company">{client.company}</div>
-                                {client.vatNumber && <div className="inv-party-detail">VAT Registration No: {client.vatNumber}</div>}
+                                {client.vatNumber && <div className="inv-party-detail">{L.vatReg}: {client.vatNumber}</div>}
                                 <div className="inv-party-detail">{client.address1}</div>
                                 <div className="inv-party-detail">{client.address2}</div>
                             </div>
@@ -1305,17 +1479,17 @@ const InvoiceGenerator: React.FC = () => {
                                 <div className="em-addr">{provider.address2}</div>
                             </div>
                             <div className="em-badge-block">
-                                <div className="em-title-badge">INVOICE</div>
+                                <div className="em-title-badge">{L.invoice}</div>
                                 <div className="em-inv-num">INV-{formData.invoiceNumber}</div>
-                                <div className="em-meta-row"><span className="em-ml">Date</span><span className="em-mv">{formatDateLong(formData.invoiceDate)}</span></div>
-                                <div className="em-meta-row"><span className="em-ml">Due</span><span className="em-mv em-due">{formatDateLong(formData.dueDate)}</span></div>
-                                <div className="em-meta-row"><span className="em-ml">Status</span><span className="em-status">UNPAID</span></div>
+                                <div className="em-meta-row"><span className="em-ml">{L.date}</span><span className="em-mv">{formatDateLong(formData.invoiceDate)}</span></div>
+                                <div className="em-meta-row"><span className="em-ml">{L.due}</span><span className="em-mv em-due">{formatDateLong(formData.dueDate)}</span></div>
+                                <div className="em-meta-row"><span className="em-ml">{L.status}</span><span className="em-status">{L.unpaid}</span></div>
                             </div>
                         </div>
                         <div className="em-bill-to-wrap">
-                            <div className="em-bill-tag">BILL TO</div>
+                            <div className="em-bill-tag">{L.billTo}</div>
                             <div className="em-bill-company">{client.company}</div>
-                            {client.vatNumber && <div className="em-bill-detail">VAT: {client.vatNumber}</div>}
+                            {client.vatNumber && <div className="em-bill-detail">{L.vat}: {client.vatNumber}</div>}
                             <div className="em-bill-detail">{client.address1} · {client.address2}</div>
                         </div>
                     </>)}
@@ -1333,19 +1507,19 @@ const InvoiceGenerator: React.FC = () => {
                                 <div className="ob-addr">{provider.address2}</div>
                             </div>
                             <div className="ob-header-right">
-                                <div className="ob-invoice-word">INVOICE</div>
+                                <div className="ob-invoice-word">{L.invoice}</div>
                                 <div className="ob-inv-num">INV-{formData.invoiceNumber}</div>
                             </div>
                         </div>
                         <div className="ob-meta-strip">
-                            <div className="ob-meta-cell"><div className="ob-mc-label">INVOICE DATE</div><div className="ob-mc-val">{formatDateLong(formData.invoiceDate)}</div></div>
-                            <div className="ob-meta-cell"><div className="ob-mc-label">DUE DATE</div><div className="ob-mc-val ob-due">{formatDateLong(formData.dueDate)}</div></div>
-                            <div className="ob-meta-cell"><div className="ob-mc-label">STATUS</div><div className="ob-mc-val ob-unpaid">UNPAID</div></div>
+                            <div className="ob-meta-cell"><div className="ob-mc-label">{L.invoiceDate.toUpperCase()}</div><div className="ob-mc-val">{formatDateLong(formData.invoiceDate)}</div></div>
+                            <div className="ob-meta-cell"><div className="ob-mc-label">{L.dueDate.toUpperCase()}</div><div className="ob-mc-val ob-due">{formatDateLong(formData.dueDate)}</div></div>
+                            <div className="ob-meta-cell"><div className="ob-mc-label">{L.status.toUpperCase()}</div><div className="ob-mc-val ob-unpaid">{L.unpaid}</div></div>
                         </div>
                         <div className="ob-bill-to">
-                            <span className="ob-bill-tag">BILL TO</span>
+                            <span className="ob-bill-tag">{L.billTo}</span>
                             <div className="ob-bill-company">{client.company}</div>
-                            {client.vatNumber && <div className="ob-bill-detail">VAT Registration No: {client.vatNumber}</div>}
+                            {client.vatNumber && <div className="ob-bill-detail">{L.vatReg}: {client.vatNumber}</div>}
                             <div className="ob-bill-detail">{client.address1} · {client.address2}</div>
                         </div>
                     </>)}
@@ -1359,11 +1533,11 @@ const InvoiceGenerator: React.FC = () => {
                         <table className="inv-table">
                             <thead>
                                 <tr className="inv-thead">
-                                    <th className="inv-th inv-col-desc">DESCRIPTION</th>
-                                    <th className="inv-th inv-col-period">SERVICE PERIOD</th>
-                                    <th className="inv-th inv-col-qty">QTY</th>
-                                    <th className="inv-th inv-col-rate">UNIT PRICE</th>
-                                    <th className="inv-th inv-col-amt">AMOUNT</th>
+                                    <th className="inv-th inv-col-desc">{L.description}</th>
+                                    <th className="inv-th inv-col-period">{L.servicePeriod}</th>
+                                    <th className="inv-th inv-col-qty">{L.qty}</th>
+                                    <th className="inv-th inv-col-rate">{L.unitPrice}</th>
+                                    <th className="inv-th inv-col-amt">{L.amount}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1371,19 +1545,19 @@ const InvoiceGenerator: React.FC = () => {
                                     <td className="inv-td inv-col-desc">
                                         <div className="inv-service-name">{formData.serviceDescription}</div>
                                         <div className="inv-service-meta">
-                                            <span>Working Days: {workingDays}</span>
-                                            {holidayDays > 0 && <span> &nbsp;·&nbsp; Public Holidays: −{holidayDays}</span>}
-                                            <span> &nbsp;·&nbsp; Billable Days: {billableDays}</span>
+                                            <span>{L.workingDays}: {workingDays}</span>
+                                            {holidayDays > 0 && <span> &nbsp;·&nbsp; {L.publicHolidays}: −{holidayDays}</span>}
+                                            <span> &nbsp;·&nbsp; {L.billableDays}: {billableDays}</span>
                                         </div>
                                     </td>
                                     <td className="inv-td inv-col-period">
                                         <span className="inv-period-from">{formatDateLong(formData.startDate)}</span>
-                                        <span className="inv-period-sep"> to </span>
+                                        <span className="inv-period-sep"> {L.to} </span>
                                         <span className="inv-period-to-inv">{formatDateLong(formData.endDate)}</span>
                                     </td>
                                     <td className="inv-td inv-col-qty">{billableHours}&nbsp;h</td>
-                                    <td className="inv-td inv-col-rate">R&nbsp;{formData.hourlyRate.toFixed(2)}/h</td>
-                                    <td className="inv-td inv-col-amt">{formatCurrency(totalAmount)}</td>
+                                    <td className="inv-td inv-col-rate">{sym}&nbsp;{formData.hourlyRate.toFixed(2)}/h</td>
+                                    <td className="inv-td inv-col-amt">{fmt(totalAmount)}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1392,15 +1566,15 @@ const InvoiceGenerator: React.FC = () => {
                     {/* Public Holidays Section */}
                     {billableHolidays.length > 0 && (
                         <div className="inv-holidays">
-                            <div className="inv-holidays-title">PUBLIC HOLIDAYS DEDUCTED WITHIN PERIOD</div>
+                            <div className="inv-holidays-title">{L.holidaysDeducted}</div>
                             {billableHolidays.map((h) => (
                                 <div key={h.id} className="inv-holiday-item">
                                     <span className="inv-h-bullet">●</span>
-                                    <span className="inv-h-name">{h.name || "Public Holiday"}</span>
+                                    <span className="inv-h-name">{h.name || L.publicHoliday}</span>
                                     <span className="inv-h-date">{" "}&mdash;{" "}{formatDateLong(h.date)}</span>
                                     <span className="inv-h-impact">
-                                        {" "}({formData.hoursPerDay}h @ R{formData.hourlyRate.toFixed(2)}/h
-                                        {" "}= −{formatCurrency(formData.hoursPerDay * formData.hourlyRate)})
+                                        {" "}({formData.hoursPerDay}h @ {sym}{formData.hourlyRate.toFixed(2)}/h
+                                        {" "}= −{fmt(formData.hoursPerDay * formData.hourlyRate)})
                                     </span>
                                 </div>
                             ))}
@@ -1411,36 +1585,36 @@ const InvoiceGenerator: React.FC = () => {
                     <div className="inv-totals-wrap">
                         <table className="inv-totals-table"><tbody>
                             <tr>
-                                <td className="inv-tot-label">Subtotal</td>
-                                <td className="inv-tot-val">{formatCurrency(totalAmount)}</td>
+                                <td className="inv-tot-label">{L.subtotal}</td>
+                                <td className="inv-tot-val">{fmt(totalAmount)}</td>
                             </tr>
                             <tr>
-                                <td className="inv-tot-label">VAT (0%)</td>
-                                <td className="inv-tot-val">R 0.00</td>
+                                <td className="inv-tot-label">{L.vatZero}</td>
+                                <td className="inv-tot-val">{sym} 0.00</td>
                             </tr>
                             <tr className="inv-tot-final">
-                                <td className="inv-tot-label final">TOTAL DUE</td>
-                                <td className="inv-tot-val final">{formatCurrency(totalAmount)}</td>
+                                <td className="inv-tot-label final">{L.totalDue}</td>
+                                <td className="inv-tot-val final">{fmt(totalAmount)}</td>
                             </tr>
                         </tbody></table>
                     </div>
 
                     {/* Payment Details */}
                     <div className="inv-payment">
-                        <div className="inv-payment-title">PAYMENT DETAILS</div>
+                        <div className="inv-payment-title">{L.paymentDetails}</div>
                         <div className="inv-payment-rows">
-                            {bank.accountName  && <div className="inv-pay-row"><span className="inv-pay-label">Account Name</span><span className="inv-pay-val">{bank.accountName}</span></div>}
-                            {bank.bankName     && <div className="inv-pay-row"><span className="inv-pay-label">Bank Name</span><span className="inv-pay-val">{bank.bankName}</span></div>}
-                            {bank.accountNumber && <div className="inv-pay-row"><span className="inv-pay-label">Account Number</span><span className="inv-pay-val">{bank.accountNumber}</span></div>}
-                            {bank.swiftCode    && <div className="inv-pay-row"><span className="inv-pay-label">SWIFT / BIC Code</span><span className="inv-pay-val">{bank.swiftCode}</span></div>}
-                            {bank.bankAddress  && <div className="inv-pay-row"><span className="inv-pay-label">Bank Address</span><span className="inv-pay-val">{bank.bankAddress}</span></div>}
+                            {bank.accountName  && <div className="inv-pay-row"><span className="inv-pay-label">{L.accountName}</span><span className="inv-pay-val">{bank.accountName}</span></div>}
+                            {bank.bankName     && <div className="inv-pay-row"><span className="inv-pay-label">{L.bankName}</span><span className="inv-pay-val">{bank.bankName}</span></div>}
+                            {bank.accountNumber && <div className="inv-pay-row"><span className="inv-pay-label">{L.accountNumber}</span><span className="inv-pay-val">{bank.accountNumber}</span></div>}
+                            {bank.swiftCode    && <div className="inv-pay-row"><span className="inv-pay-label">{L.swiftCode}</span><span className="inv-pay-val">{bank.swiftCode}</span></div>}
+                            {bank.bankAddress  && <div className="inv-pay-row"><span className="inv-pay-label">{L.bankAddress}</span><span className="inv-pay-val">{bank.bankAddress}</span></div>}
                         </div>
                     </div>
 
                     {/* Notes */}
                     {formData.notes && (
                         <div className="inv-notes">
-                            <span className="inv-notes-label">NOTES &amp; TERMS: </span>
+                            <span className="inv-notes-label">{L.notesTerms}: </span>
                             <span className="inv-notes-text">{formData.notes}</span>
                         </div>
                     )}
@@ -1449,7 +1623,7 @@ const InvoiceGenerator: React.FC = () => {
                     <div className="inv-footer">
                         <div className="inv-footer-line" />
                         <div className="inv-footer-content">
-                            <span className="inv-footer-thanks">Thank you for your business!</span>
+                            <span className="inv-footer-thanks">{L.thanks}</span>
                             <span className="inv-footer-company">{provider.company ? `${provider.company} · ` : ""}{provider.name}</span>
                         </div>
                     </div>
@@ -1473,7 +1647,7 @@ const InvoiceGenerator: React.FC = () => {
                 <Modal.Header closeButton className="border-bottom">
                     <Modal.Title className="fw-bold">
                         <FontAwesomeIcon icon={faEnvelope} className="me-2" style={{ color: "#0d6efd" }} />
-                        Send Invoice
+                        Envoyer la Facture
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -1481,7 +1655,7 @@ const InvoiceGenerator: React.FC = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>
                                     <FontAwesomeIcon icon={faUser} className="me-2" />
-                                    Your Name (Sender)
+                                    Votre Nom (Expéditeur)
                                 </Form.Label>
                                 <Form.Control
                                     type="text"
@@ -1490,7 +1664,7 @@ const InvoiceGenerator: React.FC = () => {
                                     onChange={(e) => setSenderName(e.target.value)}
                                 />
                                 <Form.Text className="text-muted">
-                                    This name will appear in the email signature
+                                    Ce nom apparaîtra dans la signature de l'email
                                 </Form.Text>
                             </Form.Group>
 
@@ -1498,7 +1672,7 @@ const InvoiceGenerator: React.FC = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>
                                     <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                                    Your Email (Sender)
+                                    Votre Email (Expéditeur)
                                 </Form.Label>
                                 <Form.Control
                                     type="email"
@@ -1507,7 +1681,7 @@ const InvoiceGenerator: React.FC = () => {
                                     style={{ backgroundColor: "var(--bs-secondary-bg, #f8f9fa)", cursor: "default" }}
                                 />
                                 <Form.Text className="text-muted">
-                                    Emails are sent from this configured Gmail account
+                                    Les emails sont envoyés depuis ce compte Gmail configuré
                                 </Form.Text>
                             </Form.Group>
 
@@ -1515,7 +1689,7 @@ const InvoiceGenerator: React.FC = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>
                                     <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                                    Recipient Email
+                                    Email du Destinataire
                                 </Form.Label>
                                 <Form.Control
                                     type="email"
@@ -1524,7 +1698,7 @@ const InvoiceGenerator: React.FC = () => {
                                     onChange={(e) => setEmailRecipient(e.target.value)}
                                 />
                                 <Form.Text className="text-muted">
-                                    The invoice will be sent to this email address
+                                    La facture sera envoyée à cette adresse email
                                 </Form.Text>
                             </Form.Group>
 
@@ -1542,15 +1716,15 @@ const InvoiceGenerator: React.FC = () => {
                                     } as React.CSSProperties}
                                 >
                                     <small style={{ fontSize: "0.9rem" }}>
-                                        <strong>PDF Size:</strong> {pdfSizeMB.toFixed(2)}MB / 5MB
+                                        <strong>Taille PDF :</strong> {pdfSizeMB.toFixed(2)}MB / 5MB
                                         {pdfSizeMB > 4.5 && (
                                             <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>
-                                                ⚠️ Approaching limit - may fail to send
+                                                ⚠️ Proche de la limite - l'envoi pourrait échouer
                                             </span>
                                         )}
                                         {pdfSizeMB <= 4.5 && (
                                             <span style={{ color: "#28a745", marginLeft: "8px" }}>
-                                                ✓ Safe to send
+                                                ✓ Prêt à envoyer
                                             </span>
                                         )}
                                     </small>
@@ -1559,7 +1733,7 @@ const InvoiceGenerator: React.FC = () => {
 
                             {/* Send Now vs Schedule Toggle */}
                             <div className="mb-4">
-                                <h5>Send Options</h5>
+                                <h5>Options d'Envoi</h5>
                                 <div style={{ display: "flex", gap: "10px" }}>
                                     <Button
                                         variant="success"
@@ -1568,7 +1742,7 @@ const InvoiceGenerator: React.FC = () => {
                                         style={{ flex: 1 }}
                                     >
                                         <FontAwesomeIcon icon={faPaperPlane} className="me-2" />
-                                        {isSendingEmail ? "Sending..." : "Send Now"}
+                                        {isSendingEmail ? "Envoi en cours..." : "Envoyer Maintenant"}
                                     </Button>
                                 </div>
                             </div>
@@ -1578,16 +1752,16 @@ const InvoiceGenerator: React.FC = () => {
                                 <Accordion.Item eventKey="1">
                                     <Accordion.Header>
                                         <FontAwesomeIcon icon={faClockRegular} className="me-2" />
-                                        Schedule for Future Months
+                                        Planifier pour les Prochains Mois
                                     </Accordion.Header>
                                     <Accordion.Body>
                                         <Form.Group className="mb-3">
-                                            <Form.Label>Recurring Frequency</Form.Label>
+                                            <Form.Label>Fréquence Récurrente</Form.Label>
                                             <div style={{ display: "flex", gap: "10px" }}>
                                                 <Form.Check
                                                     type="radio"
                                                     id="recur-monthly"
-                                                    label="Monthly"
+                                                    label="Mensuel"
                                                     value="monthly"
                                                     checked={scheduleRecurrence === "monthly"}
                                                     onChange={(e) => setScheduleRecurrence(e.target.value as any)}
@@ -1595,7 +1769,7 @@ const InvoiceGenerator: React.FC = () => {
                                                 <Form.Check
                                                     type="radio"
                                                     id="recur-quarterly"
-                                                    label="Quarterly"
+                                                    label="Trimestriel"
                                                     value="quarterly"
                                                     checked={scheduleRecurrence === "quarterly"}
                                                     onChange={(e) => setScheduleRecurrence(e.target.value as any)}
@@ -1603,14 +1777,14 @@ const InvoiceGenerator: React.FC = () => {
                                                 <Form.Check
                                                     type="radio"
                                                     id="recur-yearly"
-                                                    label="Yearly"
+                                                    label="Annuel"
                                                     value="yearly"
                                                     checked={scheduleRecurrence === "yearly"}
                                                     onChange={(e) => setScheduleRecurrence(e.target.value as any)}
                                                 />
                                             </div>
                                             <Form.Text className="text-muted" style={{ display: "block", marginTop: "10px" }}>
-                                                Invoice will be automatically sent every {scheduleRecurrence === "quarterly" ? "3 months" : scheduleRecurrence === "yearly" ? "12 months" : "month"} starting next month
+                                                La facture sera envoyée automatiquement chaque {scheduleRecurrence === "quarterly" ? "3 mois" : scheduleRecurrence === "yearly" ? "12 mois" : "mois"} à partir du mois prochain
                                             </Form.Text>
                                         </Form.Group>
                                         <Button
@@ -1620,7 +1794,7 @@ const InvoiceGenerator: React.FC = () => {
                                             style={{ width: "100%" }}
                                         >
                                             <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
-                                            {isSendingEmail ? "Scheduling..." : "Schedule"}
+                                            {isSendingEmail ? "Planification..." : "Planifier"}
                                         </Button>
                                     </Accordion.Body>
                                 </Accordion.Item>
@@ -1631,7 +1805,7 @@ const InvoiceGenerator: React.FC = () => {
                                 <div style={{ marginTop: "30px", paddingTop: "20px", borderTop: "1px solid #dee2e6" }}>
                                     <h5 className="mb-3">
                                         <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
-                                        Active Scheduled Invoices
+                                        Factures Planifiées Actives
                                     </h5>
                                     {scheduledInvoices.map((inv) => (
                                         <Card key={inv.id} className="mb-2" style={{ background: "#f8f9fa" }}>
@@ -1644,7 +1818,7 @@ const InvoiceGenerator: React.FC = () => {
                                                     {inv.clientEmail}
                                                 </small>
                                                 <small style={{ color: "#666", display: "block", marginBottom: "8px" }}>
-                                                    Next send: {new Date(inv.nextSendDate).toLocaleDateString()}
+                                                    Prochain envoi : {new Date(inv.nextSendDate).toLocaleDateString("fr-FR")}
                                                 </small>
                                                 <Button
                                                     size="sm"
@@ -1653,7 +1827,7 @@ const InvoiceGenerator: React.FC = () => {
                                                     style={{ width: "100%" }}
                                                 >
                                                     <FontAwesomeIcon icon={faTrash} className="me-2" />
-                                                    Remove
+                                                    Supprimer
                                                 </Button>
                                             </Card.Body>
                                         </Card>
@@ -1666,7 +1840,7 @@ const InvoiceGenerator: React.FC = () => {
                         variant="secondary"
                         onClick={() => setShowScheduleModal(false)}
                     >
-                        Close
+                        Fermer
                     </Button>
                 </Modal.Footer>
             </Modal>

@@ -92,7 +92,7 @@ const NavbarComponent = () => {
                                     onClick={handleNavClick}
                                     active={location.pathname === "/qrcode"}
                                 >
-                                    QR Code Generator
+                                    Générateur de Codes QR
                                 </NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item
@@ -101,7 +101,7 @@ const NavbarComponent = () => {
                                     onClick={handleNavClick}
                                     active={location.pathname === "/invoice"}
                                 >
-                                    Invoice Generator
+                                    Générateur de Factures
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link

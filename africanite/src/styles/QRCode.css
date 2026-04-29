@@ -11,8 +11,8 @@
     margin-bottom: 1rem;
 }
 
-.price-badge {
-    background-color: #2C6E49;
+.free-badge {
+    background: linear-gradient(135deg, #2C6E49, #4C956C);
     color: white;
     padding: 0.5rem 1.5rem;
     border-radius: 25px;
@@ -20,6 +20,83 @@
     font-size: 1.1rem;
     display: inline-block;
     box-shadow: 0 4px 6px rgba(44, 110, 73, 0.3);
+}
+
+/* QR Type Selection Grid */
+.qr-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 576px) {
+    .qr-type-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.qr-type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.qr-type-card:hover {
+    border-color: #4C956C;
+    background: #f0fdf4;
+    transform: translateY(-2px);
+}
+
+.qr-type-card.active {
+    border-color: #2C6E49;
+    background: #ecfdf5;
+    box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.15);
+}
+
+.qr-type-icon {
+    font-size: 1.5rem;
+}
+
+.qr-type-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #283618;
+}
+
+/* Branding Section */
+.qr-branding-section {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 1rem;
+}
+
+.qr-section-label {
+    color: #2C6E49;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Color Pickers */
+.qr-color-input {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 2px !important;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.qr-color-text {
+    width: 90px !important;
+    font-family: monospace !important;
+    font-size: 0.85rem !important;
 }
 
 .qrcode-form-card {
@@ -138,125 +215,6 @@
 .btn-group .btn {
     padding: 0.75rem 1.5rem;
     font-weight: 600;
-}
-
-/* Modern PDF Upload Zone */
-.pdf-upload-zone {
-    border: 3px dashed #CBD5E0;
-    border-radius: 12px;
-    padding: 2.5rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #F7FAFC;
-    position: relative;
-}
-
-.pdf-upload-zone:hover {
-    border-color: #2C6E49;
-    background-color: #F0FDF4;
-    transform: translateY(-2px);
-}
-
-.pdf-upload-zone.dragging {
-    border-color: #2C6E49;
-    background-color: #ECFDF5;
-    border-style: solid;
-    transform: scale(1.02);
-}
-
-.pdf-upload-zone.has-file {
-    border-color: #10B981;
-    background-color: #ECFDF5;
-    border-style: solid;
-}
-
-.pdf-upload-zone.has-error {
-    border-color: #EF4444;
-    background-color: #FEF2F2;
-}
-
-.upload-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.upload-icon {
-    font-size: 4rem;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-.upload-title {
-    color: #2C6E49;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin: 0;
-}
-
-.upload-text {
-    color: #6B7280;
-    margin: 0;
-    font-size: 0.95rem;
-}
-
-.file-preview {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.file-icon {
-    font-size: 3rem;
-}
-
-.file-details {
-    flex: 1;
-    text-align: left;
-}
-
-.file-name {
-    font-weight: 600;
-    color: #2C6E49;
-    margin: 0;
-    word-break: break-word;
-}
-
-.file-size {
-    color: #6B7280;
-    font-size: 0.85rem;
-}
-
-.remove-btn {
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
-}
-
-.remove-btn:hover {
-    transform: scale(1.1);
-    background-color: #DC2626;
-    color: white;
 }
 
 @media (max-width: 768px) {
