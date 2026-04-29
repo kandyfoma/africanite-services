@@ -1,81 +1,74 @@
 import React from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Globe, Smartphone, Monitor, Settings, CheckCircle, Handshake, Rocket, ArrowRight } from "lucide-react";
 import "../styles/Home.css";
 
 const Home = () => {
     const navigate = useNavigate();
 
+    const fadeUp = {
+        hidden: { opacity: 0, y: 30 },
+        visible: (i = 0) => ({
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.6, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] },
+        }),
+    };
+
     return (
-        <div className="home">
-            {/* Hero Section */}
-            <section className="hero">
+        <div className="home-apple">
+            {/* Hero */}
+            <section className="hero-apple">
                 <Container>
                     <motion.div
                         className="hero-content"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        initial="hidden"
+                        animate="visible"
+                        variants={fadeUp}
                     >
-                        <h1>Propulsez Votre Entreprise vers le Futur Numérique</h1>
-                        <p>
-                            Des solutions technologiques innovantes qui transforment votre vision en succès.
-                            De l'intelligence artificielle au développement web, nous créons des expériences
-                            numériques qui démarquent votre entreprise de la concurrence.
-                        </p>
+                        <h1>Propulsez votre entreprise<br />vers le futur numérique.</h1>
                         <p className="hero-subtitle">
-                            🚀 Solutions sur mesure | 🤖 IA intégrée | ⚡ Développement rapide | 🛡️ Support 24/7
+                            Des solutions technologiques innovantes qui transforment votre vision en succès.
+                            De l'intelligence artificielle au développement web.
                         </p>
-                        <Button
-                            variant="primary"
-                            className="cta-button"
-                            onClick={() => navigate("/services")}
-                        >
-                            Découvrir Nos Solutions
-                        </Button>
+                        <div className="hero-actions">
+                            <button className="btn-primary-apple" onClick={() => navigate("/services")}>
+                                Découvrir nos solutions
+                                <ArrowRight size={16} />
+                            </button>
+                            <button className="btn-secondary-apple" onClick={() => navigate("/contact")}>
+                                Nous contacter
+                            </button>
+                        </div>
                     </motion.div>
                 </Container>
             </section>
 
-            {/* Services Section */}
-            <section className="services">
+            {/* Services */}
+            <section className="section-apple">
                 <Container>
-                    <h2>Nos Services</h2>
-                    <Row>
+                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                        <h2 className="section-heading">Nos Services</h2>
+                        <p className="section-subheading">
+                            Des solutions complètes pour chaque étape de votre transformation digitale.
+                        </p>
+                    </motion.div>
+                    <Row className="g-4 mt-2">
                         {[
-                            {
-                                icon: "fa-globe",
-                                title: "Développement Web",
-                                description: "Sites web et applications personnalisés construits avec les technologies de pointe"
-                            },
-                            {
-                                icon: "fa-mobile-alt",
-                                title: "Applications Mobiles",
-                                description: "Applications mobiles natives et multiplateformes pour iOS et Android"
-                            },
-                            {
-                                icon: "fa-laptop-code",
-                                title: "Conseil Informatique",
-                                description: "Orientation stratégique en technologie et solutions de transformation numérique"
-                            },
-                            {
-                                icon: "fa-cogs",
-                                title: "Services Informatiques",
-                                description: "Support et maintenance informatique complets pour votre entreprise"
-                            }
-                        ].map((service, index) => (
-                            <Col key={index} md={3} className="mb-4">
-                                <motion.div
-                                    className="service-card"
-                                    whileHover={{ scale: 1.05 }}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: index * 0.2 }}
-                                >
-                                    <i className={`fas ${service.icon}`}></i>
+                            { icon: Globe, title: "Développement Web", desc: "Sites web et applications personnalisés construits avec les technologies de pointe" },
+                            { icon: Smartphone, title: "Applications Mobiles", desc: "Applications mobiles natives et multiplateformes pour iOS et Android" },
+                            { icon: Monitor, title: "Conseil Informatique", desc: "Orientation stratégique en technologie et solutions de transformation numérique" },
+                            { icon: Settings, title: "Services Informatiques", desc: "Support et maintenance informatique complets pour votre entreprise" },
+                        ].map((service, i) => (
+                            <Col key={i} md={6} lg={3}>
+                                <motion.div className="card-apple" custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                                    <div className="card-icon">
+                                        <service.icon size={28} strokeWidth={1.5} />
+                                    </div>
                                     <h3>{service.title}</h3>
-                                    <p>{service.description}</p>
+                                    <p>{service.desc}</p>
                                 </motion.div>
                             </Col>
                         ))}
@@ -83,40 +76,25 @@ const Home = () => {
                 </Container>
             </section>
 
-            {/* Why Choose Us Section */}
-            <section className="why-us">
+            {/* Why Us */}
+            <section className="section-apple section-alt">
                 <Container>
-                    <h2>Pourquoi Choisir Africanite Services?</h2>
-                    <Row>
+                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                        <h2 className="section-heading">Pourquoi Africanite Services?</h2>
+                    </motion.div>
+                    <Row className="g-4 mt-2">
                         {[
-                            {
-                                icon: "fa-check-circle",
-                                title: "Expertise",
-                                description: "Des années d'expérience dans la fourniture de solutions informatiques de qualité"
-                            },
-                            {
-                                icon: "fa-handshake",
-                                title: "Orienté Client",
-                                description: "Dévoué à comprendre et répondre à vos besoins spécifiques"
-                            },
-                            {
-                                icon: "fa-rocket",
-                                title: "Innovation",
-                                description: "Utilisation des dernières technologies pour des solutions optimales"
-                            }
-                        ].map((feature, index) => (
-                            // Services Section - Update the Col props
-                            <Col key={index} md={4} className="mb-4">
-                                <motion.div
-                                    className="feature"
-                                    whileHover={{ scale: 1.05 }}
-                                    initial={{ opacity: 0 }}
-                                    whileInView={{ opacity: 1 }}
-                                    viewport={{ once: true }}
-                                >
-                                    <i className={`fas ${feature.icon}`}></i>
+                            { icon: CheckCircle, title: "Expertise", desc: "Des années d'expérience dans la fourniture de solutions informatiques de qualité" },
+                            { icon: Handshake, title: "Orienté Client", desc: "Dévoué à comprendre et répondre à vos besoins spécifiques" },
+                            { icon: Rocket, title: "Innovation", desc: "Utilisation des dernières technologies pour des solutions optimales" },
+                        ].map((feature, i) => (
+                            <Col key={i} md={4}>
+                                <motion.div className="card-apple card-centered" custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                                    <div className="card-icon">
+                                        <feature.icon size={28} strokeWidth={1.5} />
+                                    </div>
                                     <h3>{feature.title}</h3>
-                                    <p>{feature.description}</p>
+                                    <p>{feature.desc}</p>
                                 </motion.div>
                             </Col>
                         ))}
@@ -124,24 +102,16 @@ const Home = () => {
                 </Container>
             </section>
 
-            {/* Call to Action Section */}
-            <section className="cta-section">
+            {/* CTA */}
+            <section className="cta-apple">
                 <Container>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                    >
-                        <h2>Prêt à Commencer Votre Voyage Numérique?</h2>
+                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                        <h2>Prêt à commencer votre<br />voyage numérique?</h2>
                         <p>Discutons de la façon dont nous pouvons transformer votre entreprise</p>
-                        <Button
-                            variant="warning"
-                            size="lg"
-                            className="cta-button"
-                            onClick={() => navigate("/contact")}
-                        >
-                            Contactez-Nous Aujourd'hui
-                        </Button>
+                        <button className="btn-primary-apple btn-lg" onClick={() => navigate("/contact")}>
+                            Contactez-nous aujourd'hui
+                            <ArrowRight size={18} />
+                        </button>
                     </motion.div>
                 </Container>
             </section>

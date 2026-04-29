@@ -25,6 +25,7 @@
     "html2canvas": "^1.4.1",
     "i18next": "^24.2.3",
     "jspdf": "^4.2.0",
+    "lucide-react": "^1.14.0",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",

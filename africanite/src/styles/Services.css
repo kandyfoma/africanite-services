@@ -1,30 +1,134 @@
-.services-page {
-    padding: 4rem 1rem;
-    background-color: #f8f9fa;
+/* ===== Services — Apple-Inspired ===== */
+
+.services-page-apple {
+    padding: var(--space-section) 0;
+    background: var(--color-bg);
 }
 
-.service-card {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
+.services-page-apple .container {
+    max-width: 980px;
+}
+
+.services-header {
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: var(--space-2xl);
 }
 
-.service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.services-header h1 {
+    font-size: clamp(2rem, 4vw, var(--font-size-4xl));
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
 }
 
-.service-card h3 {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.services-header p {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.service-card p {
-    font-size: 1rem;
-    color: var(--text-dark);
-    line-height: 1.6;
+.service-card-apple {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    height: 100%;
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.service-card-apple:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.service-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-lg);
+    color: var(--color-text);
+}
+
+.service-card-apple h3 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.service-card-apple p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+}
+
+.service-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-light);
+}
+
+.service-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+}
+
+.services-divider {
+    height: 1px;
+    background: var(--color-border-light);
+    margin: var(--space-3xl) 0;
+}
+
+.service-card-compact {
+    background: var(--color-surface-secondary);
+    border: none;
+}
+
+.service-card-compact:hover {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+}
+
+@media (max-width: 768px) {
+    .services-page-apple {
+        padding: var(--space-3xl) var(--space-lg);
+    }
+
+    .service-card-apple {
+        padding: var(--space-xl);
+    }
+
+    .services-header h1 {
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .services-page-apple {
+        padding: var(--space-2xl) var(--space-md);
+    }
+
+    .services-header p {
+        font-size: var(--font-size-base);
+    }
+
+    .service-card-apple {
+        padding: var(--space-lg);
+    }
+
+    .services-divider {
+        margin: var(--space-2xl) 0;
+    }
 }

@@ -191,76 +191,73 @@ const QRCodeGenerator: React.FC = () => {
             // Dynamic canvas height based on content
             const hasBrand = !!brandName.trim();
             const hasTagline = !!tagline.trim();
-            const headerH = (hasBrand ? 80 : 0) + (hasTagline ? 50 : 0) + (hasBrand || hasTagline ? 30 : 0);
-            const qrSize = 450;
-            const footerH = 80;
-            const padding = 40;
-            const innerPad = 30;
+            const headerH = (hasBrand ? 60 : 0) + (hasTagline ? 36 : 0) + (hasBrand || hasTagline ? 24 : 0);
+            const qrSize = 420;
+            const footerH = 64;
+            const padding = 48;
+            const innerPad = 40;
 
-            canvas.width = 900;
+            canvas.width = 860;
             canvas.height = padding * 2 + innerPad * 2 + headerH + qrSize + footerH;
 
-            // White background
+            // Solid white background
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Container shadow + border
-            const shadowOff = 6;
-            ctx.fillStyle = "#E0E0E0";
-            ctx.fillRect(padding + shadowOff, padding + shadowOff, canvas.width - 2 * padding, canvas.height - 2 * padding);
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(padding, padding, canvas.width - 2 * padding, canvas.height - 2 * padding);
-            ctx.strokeStyle = "#2C6E49";
-            ctx.lineWidth = 4;
-            ctx.strokeRect(padding, padding, canvas.width - 2 * padding, canvas.height - 2 * padding);
+            // Clean container with subtle border
+            const rx = padding, ry = padding;
+            const rw = canvas.width - 2 * padding, rh = canvas.height - 2 * padding;
+            ctx.strokeStyle = "#E8E8ED";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(rx, ry, rw, rh);
 
             let yPos = padding + innerPad;
             const maxTextW = canvas.width - padding * 4;
 
-            // Brand name (with overflow guard)
+            // Brand name
             if (hasBrand) {
-                ctx.font = "bold 60px Arial";
-                ctx.fillStyle = "#2C6E49";
+                ctx.font = "600 48px -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif";
+                ctx.fillStyle = "#1D1D1F";
                 ctx.textAlign = "center";
-                let display = brandName.toUpperCase();
+                let display = brandName;
                 while (ctx.measureText(display).width > maxTextW && display.length > 3) {
                     display = display.slice(0, -1);
                 }
                 if (display.length < brandName.length) display += "…";
-                ctx.fillText(display, canvas.width / 2, yPos + 50);
-                yPos += 80;
+                ctx.fillText(display, canvas.width / 2, yPos + 40);
+                yPos += 60;
             }
 
-            // Tagline (with overflow guard)
+            // Tagline
             if (hasTagline) {
-                ctx.font = "28px Arial";
-                ctx.fillStyle = "#283618";
+                ctx.font = "400 22px -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
+                ctx.fillStyle = "#86868B";
                 ctx.textAlign = "center";
                 let display = tagline;
                 while (ctx.measureText(display).width > maxTextW && display.length > 3) {
                     display = display.slice(0, -1);
                 }
                 if (display.length < tagline.length) display += "…";
-                ctx.fillText(display, canvas.width / 2, yPos + 28);
-                yPos += 50;
+                ctx.fillText(display, canvas.width / 2, yPos + 22);
+                yPos += 36;
             }
 
-            if (hasBrand || hasTagline) yPos += 20;
+            if (hasBrand || hasTagline) yPos += 16;
 
             // QR code
             ctx.drawImage(qrCanvas, (canvas.width - qrSize) / 2, yPos, qrSize, qrSize);
-            yPos += qrSize + 25;
+            yPos += qrSize + 20;
 
             // Scan instruction
-            ctx.font = "22px Arial";
-            ctx.fillStyle = "#4C956C";
+            ctx.font = "400 17px -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
+            ctx.fillStyle = "#86868B";
             ctx.textAlign = "center";
             ctx.fillText("Scannez avec votre caméra", canvas.width / 2, yPos);
-            yPos += 28;
+            yPos += 22;
 
-            // Content hint (type-specific)
-            ctx.font = "16px Arial";
-            ctx.fillStyle = "#DDA15E";
+            // Content hint
+            ctx.font = "400 13px -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
+            ctx.fillStyle = "#ACACB0";
             let hint = "";
             switch (qrType) {
                 case "url":   hint = url.length > 55 ? url.substring(0, 52) + "..." : url; break;
@@ -378,16 +375,10 @@ const QRCodeGenerator: React.FC = () => {
                                                 value={url}
                                                 onChange={(e) => handleUrlChange(e.target.value)}
                                                 isInvalid={!!urlError}
-                                                isValid={isUrlValid && url.length > 0}
                                             />
                                             {urlError && (
                                                 <Form.Control.Feedback type="invalid">
                                                     {urlError}
-                                                </Form.Control.Feedback>
-                                            )}
-                                            {isUrlValid && url.length > 0 && (
-                                                <Form.Control.Feedback type="valid">
-                                                    ✓ URL valide
                                                 </Form.Control.Feedback>
                                             )}
                                             <Form.Text className="text-muted">
@@ -477,7 +468,6 @@ const QRCodeGenerator: React.FC = () => {
                                                     placeholder="contact@example.com"
                                                     value={email.address}
                                                     onChange={(e) => setEmail((em) => ({ ...em, address: e.target.value }))}
-                                                    isValid={validateEmail(email.address) && email.address.length > 0}
                                                     isInvalid={email.address.length > 3 && !validateEmail(email.address)}
                                                 />
                                             </Form.Group>
@@ -649,40 +639,39 @@ const QRCodeGenerator: React.FC = () => {
                         {/* ── Result ── */}
                         {qrCodeDataUrl && (
                             <motion.div
-                                className="qrcode-result mt-5"
+                                className="qrcode-result mt-4"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <Card className="shadow">
+                                <Card className="qrcode-result-card">
                                     <Card.Body className="text-center p-4">
-                                        <h3 className="mb-4">Votre QR Code</h3>
-                                        <img
-                                            src={qrCodeDataUrl}
-                                            alt="QR Code généré"
-                                            className="qrcode-preview mb-4"
-                                        />
-                                        <div className="d-flex gap-2 justify-content-center flex-wrap">
+                                        <p className="qr-result-label">Votre QR Code</p>
+                                        <div className="qr-preview-wrapper">
+                                            <img
+                                                src={qrCodeDataUrl}
+                                                alt="QR Code généré"
+                                                className="qrcode-preview"
+                                            />
+                                        </div>
+                                        <div className="qr-actions">
                                             <Button
-                                                variant="success"
+                                                className="qr-btn-download"
                                                 onClick={() => downloadQRCode("png")}
-                                                size="lg"
                                             >
-                                                📥 Télécharger PNG
+                                                Télécharger PNG
                                             </Button>
                                             <Button
-                                                variant="outline-success"
+                                                className="qr-btn-secondary"
                                                 onClick={() => downloadQRCode("svg")}
-                                                size="lg"
                                             >
-                                                📐 Télécharger SVG
+                                                Télécharger SVG
                                             </Button>
                                             <Button
-                                                variant="outline-secondary"
+                                                className="qr-btn-tertiary"
                                                 onClick={resetForm}
-                                                size="lg"
                                             >
-                                                🔄 Nouveau QR Code
+                                                Nouveau
                                             </Button>
                                         </div>
                                     </Card.Body>
@@ -695,28 +684,20 @@ const QRCodeGenerator: React.FC = () => {
                 </Row>
 
                 {/* ── Features Section ── */}
-                <Row className="mt-5">
-                    <Col md={3} sm={6} className="text-center mb-4">
-                        <div className="feature-icon mb-3" role="img" aria-label="Personnalisé">✨</div>
-                        <h4>Personnalisé</h4>
-                        <p className="text-muted">Marque, couleurs et slogan</p>
-                    </Col>
-                    <Col md={3} sm={6} className="text-center mb-4">
-                        <div className="feature-icon mb-3" role="img" aria-label="Scannable">📱</div>
-                        <h4>Scannable</h4>
-                        <p className="text-muted">Compatible tous smartphones</p>
-                    </Col>
-                    <Col md={3} sm={6} className="text-center mb-4">
-                        <div className="feature-icon mb-3" role="img" aria-label="Gratuit">🆓</div>
-                        <h4>100% Gratuit</h4>
-                        <p className="text-muted">Sans limite, sans compte</p>
-                    </Col>
-                    <Col md={3} sm={6} className="text-center mb-4">
-                        <div className="feature-icon mb-3" role="img" aria-label="Multi-types">📶</div>
-                        <h4>Multi-types</h4>
-                        <p className="text-muted">URL, WiFi, email, SMS...</p>
-                    </Col>
-                </Row>
+                <div className="qr-features-grid mt-4">
+                    {[
+                        { icon: "✨", title: "Personnalisé", desc: "Marque, couleurs et slogan" },
+                        { icon: "📱", title: "Scannable", desc: "Compatible tous smartphones" },
+                        { icon: "🆓", title: "100% Gratuit", desc: "Sans limite, sans compte" },
+                        { icon: "📶", title: "Multi-types", desc: "URL, WiFi, email, SMS..." },
+                    ].map((f, i) => (
+                        <div key={i} className="qr-feature-item">
+                            <span className="qr-feature-icon">{f.icon}</span>
+                            <h4>{f.title}</h4>
+                            <p>{f.desc}</p>
+                        </div>
+                    ))}
+                </div>
             </Container>
         </motion.div>
     );

@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load all page components
 const Home = lazy(() => import("./components/Home"));
@@ -23,14 +24,15 @@ const LoadingFallback = () => (
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: "#fbfbfd",
     }}>
         <div style={{
-            width: "40px",
-            height: "40px",
-            border: "4px solid #f4f1de",
-            borderTop: "4px solid #2C6E49",
+            width: "24px",
+            height: "24px",
+            border: "2.5px solid #e8e8ed",
+            borderTop: "2.5px solid #1d1d1f",
             borderRadius: "50%",
-            animation: "spin 0.8s linear infinite",
+            animation: "spin 0.7s linear infinite",
         }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -43,6 +45,7 @@ const App: React.FC = () => {
     return (
         <Router basename={basename}>
             <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+                <ScrollToTop />
                 <Navbar />
                 <main style={{ flex: "1" }}>
                     <Suspense fallback={<LoadingFallback />}>

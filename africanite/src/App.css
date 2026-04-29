@@ -1,95 +1,22 @@
+/* App.css — minimal overrides, design system is in index.css */
+
+/* Keep old variable names for backward-compat with components not yet migrated */
 :root {
-  --primary-color: #2a9d8f;
-  /* Green (Primary) */
-  --secondary-color: #264653;
-  /* Dark Green */
-  --accent-color: #e9c46a;
-  /* Yellow Accent */
-  --background-color: #f4f1de;
-  /* Light Neutral Background */
-  --text-dark: #264653;
-  /* Dark Text */
-  --text-light: #f4f1de;
-  /* Light Text */
-}
-
-#root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-dark);
-  background-color: var(--background-color);
+  --primary-color: #0071e3;
+  --secondary-color: #1d1d1f;
+  --accent-color: #0071e3;
+  --background-color: #fbfbfd;
+  --background-light: #f5f5f7;
+  --text-dark: #1d1d1f;
+  --text-light: #ffffff;
 }
 
 .logo {
-  height: 50px;
+  height: 36px;
   width: auto;
-  transition: transform 0.3s ease;
+  transition: opacity var(--transition-fast);
 }
 
 .logo:hover {
-  transform: scale(1.05);
-}
-
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.card {
-  background: var(--text-light);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin: 1rem 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-}
-
-button {
-  background-color: var(--primary-color);
-  color: var(--text-light);
-  border: none;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-button:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-2px);
-}
-
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 0.5rem;
-  }
-
-  .card {
-    padding: 1rem;
-  }
+  opacity: 0.7;
 }

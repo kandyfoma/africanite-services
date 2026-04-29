@@ -7,47 +7,47 @@
 
 .inv-page {
     min-height: 80vh;
-    background: linear-gradient(135deg, #eef2ff 0%, #e8f0fe 40%, #ede9fe 100%);
+    background: var(--color-bg);
     padding: 2rem 0 4rem;
 }
 
 .inv-page-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #1e3a5f, #2d6aaa);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    color: #fff;
+    font-size: 1.5rem;
+    color: var(--color-text);
     margin-bottom: 1rem;
-    box-shadow: 0 8px 24px rgba(30, 58, 95, 0.25);
 }
 
 .inv-page-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #1e3a5f;
+    font-size: clamp(1.75rem, 3vw, var(--font-size-3xl));
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.02em;
     margin-bottom: 0.4rem;
 }
 
 .inv-page-sub {
-    color: #64748b;
-    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
 }
 
 /* ─── FORM CARDS ─────────────────────────────────────────────────── */
 
 .inv-card {
-    border: none;
-    border-radius: 14px;
-    box-shadow: 0 2px 14px rgba(30, 58, 95, 0.07);
-    transition: box-shadow 0.25s;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    transition: box-shadow var(--transition-base);
 }
 
 .inv-card:hover {
-    box-shadow: 0 6px 24px rgba(30, 58, 95, 0.12);
+    box-shadow: var(--shadow-sm);
 }
 
 .inv-card .card-body {
@@ -55,9 +55,9 @@
 }
 
 .inv-section-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1e3a5f;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 1.2rem;
@@ -908,12 +908,143 @@
     .inv-paper-wrap {
         padding: 1rem 0 2rem;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         justify-content: flex-start;
     }
 
     .inv-paper {
         min-width: 794px;
         width: 794px;
+    }
+}
+
+@media (max-width: 768px) {
+    .inv-page {
+        padding: 1.5rem 0 2.5rem;
+    }
+
+    .inv-page-title {
+        font-size: 1.5rem;
+    }
+
+    .inv-card .card-body {
+        padding: 1rem;
+    }
+
+    .inv-section-title {
+        font-size: var(--font-size-xs);
+    }
+
+    .inv-toolbar-inner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .inv-toolbar-title {
+        font-size: 0.9rem;
+        width: 100%;
+    }
+
+    .inv-toolbar .btn {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .inv-summary-card {
+        border-radius: 12px;
+    }
+
+    .inv-preview-btn {
+        width: 100%;
+    }
+
+    .inv-theme-switcher {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .inv-suggestion-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .inv-suggestion-actions {
+        width: 100%;
+    }
+
+    .inv-sug-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .inv-page {
+        padding: 1rem 0 2rem;
+    }
+
+    .inv-page-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    .inv-page-title {
+        font-size: 1.25rem;
+    }
+
+    .inv-page-sub {
+        font-size: var(--font-size-sm);
+    }
+
+    .inv-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .inv-card .form-label {
+        font-size: 0.75rem;
+    }
+
+    .inv-card .form-control,
+    .inv-card .form-select {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.7rem;
+    }
+
+    .inv-summary-header {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .inv-summary-body {
+        padding: 0.75rem 1rem 0;
+    }
+
+    .inv-summary-label {
+        font-size: 0.75rem;
+    }
+
+    .inv-summary-value {
+        font-size: 0.82rem;
+    }
+
+    .inv-total-value {
+        font-size: 1.4rem;
+    }
+
+    .inv-suggestions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .inv-approve-all-btn {
+        width: 100%;
+    }
+
+    .inv-period-info {
+        padding: 0.5rem 0.75rem;
     }
 }
 

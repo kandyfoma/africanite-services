@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Button } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -7,76 +7,76 @@ const NotFound = () => {
     const navigate = useNavigate();
 
     return (
-        <div
-            style={{
-                minHeight: "70vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "linear-gradient(135deg, #f4f1de 0%, #eef3fb 100%)",
-            }}
-        >
+        <div style={{
+            minHeight: "70vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "var(--color-bg)",
+        }}>
             <Container className="text-center">
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
                 >
-                    <h1
-                        style={{
-                            fontSize: "8rem",
-                            fontWeight: 800,
-                            color: "#2C6E49",
-                            lineHeight: 1,
-                            marginBottom: "0.5rem",
-                        }}
-                    >
+                    <h1 style={{
+                        fontSize: "8rem",
+                        fontWeight: 700,
+                        color: "var(--color-text)",
+                        lineHeight: 1,
+                        letterSpacing: "-0.04em",
+                        marginBottom: "0.5rem",
+                    }}>
                         404
                     </h1>
-                    <h2
-                        style={{
-                            color: "#283618",
-                            marginBottom: "1rem",
-                            fontSize: "1.8rem",
-                        }}
-                    >
+                    <h2 style={{
+                        color: "var(--color-text)",
+                        marginBottom: "1rem",
+                        fontSize: "1.5rem",
+                        fontWeight: 600,
+                    }}>
                         Page Introuvable
                     </h2>
-                    <p
-                        style={{
-                            color: "#666",
-                            maxWidth: "500px",
-                            margin: "0 auto 2rem",
-                            fontSize: "1.1rem",
-                        }}
-                    >
+                    <p style={{
+                        color: "var(--color-text-secondary)",
+                        maxWidth: "420px",
+                        margin: "0 auto 2rem",
+                        fontSize: "var(--font-size-base)",
+                        lineHeight: 1.5,
+                    }}>
                         Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
                     </p>
-                    <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-                        <Button
-                            variant="primary"
-                            size="lg"
+                    <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+                        <button
                             onClick={() => navigate("/")}
+                            className="btn-primary-apple"
                             style={{
-                                backgroundColor: "#2C6E49",
+                                background: "var(--color-accent)",
+                                color: "#fff",
                                 border: "none",
-                                padding: "0.8rem 2rem",
+                                padding: "0.7rem 1.75rem",
+                                borderRadius: "980px",
+                                fontSize: "var(--font-size-sm)",
+                                cursor: "pointer",
                             }}
                         >
                             Retour à l'Accueil
-                        </Button>
-                        <Button
-                            variant="outline-primary"
-                            size="lg"
+                        </button>
+                        <button
                             onClick={() => navigate("/contact")}
                             style={{
-                                color: "#2C6E49",
-                                borderColor: "#2C6E49",
-                                padding: "0.8rem 2rem",
+                                background: "transparent",
+                                color: "var(--color-accent)",
+                                border: "none",
+                                padding: "0.7rem 1.75rem",
+                                borderRadius: "980px",
+                                fontSize: "var(--font-size-sm)",
+                                cursor: "pointer",
                             }}
                         >
                             Contactez-Nous
-                        </Button>
+                        </button>
                     </div>
                 </motion.div>
             </Container>
