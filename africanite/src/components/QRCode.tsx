@@ -40,6 +40,11 @@ const QR_TYPES: { id: QRContentType; label: string; icon: string; desc: string }
 // HELPERS
 // ─────────────────────────────────────────────
 
+/** Escape special chars for WIFI QR spec (semicolons, colons, backslashes, commas) */
+function escapeWifiField(value: string): string {
+    return value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/:/g, "\\:").replace(/,/g, "\\,").replace(/"/g, '\\"');
+}
+
 /** Build the raw string that gets encoded into the QR code */
 function buildQRContent(
     type: QRContentType,
@@ -61,7 +66,7 @@ function buildQRContent(
             const w = data.wifi;
             if (!w) return "";
             const hidden = w.hidden ? "H:true;" : "";
-            return `WIFI:T:${w.encryption};S:${w.ssid};P:${w.password};${hidden};`;
+            return `WIFI:T:${w.encryption};S:${escapeWifiField(w.ssid)};P:${escapeWifiField(w.password)};${hidden};`;
         }
         case "email": {
             const e = data.email;
@@ -84,17 +89,22 @@ function buildQRContent(
     }
 }
 
-function validateURL(urlString: string): { valid: boolean; error?: string } {
+function validateURL(urlString: string): { valid: boolean; error?: string; normalized?: string } {
     if (!urlString) return { valid: false, error: "L'URL est requise" };
+    let normalized = urlString.trim();
+    // Auto-prefix if user forgot protocol
+    if (!/^https?:\/\//i.test(normalized) && /^[a-zA-Z0-9]/.test(normalized)) {
+        normalized = "https://" + normalized;
+    }
     try {
-        const urlObj = new URL(urlString);
+        const urlObj = new URL(normalized);
         if (!["http:", "https:"].includes(urlObj.protocol))
             return { valid: false, error: "L'URL doit commencer par http:// ou https://" };
-        if (!urlObj.hostname || urlObj.hostname.length < 3)
+        if (!urlObj.hostname || !urlObj.hostname.includes("."))
             return { valid: false, error: "Nom de domaine invalide" };
-        if (urlString.includes(" "))
+        if (normalized.includes(" "))
             return { valid: false, error: "L'URL ne doit pas contenir d'espaces" };
-        return { valid: true };
+        return { valid: true, normalized };
     } catch {
         return { valid: false, error: "Format d'URL invalide. Exemple: https://example.com" };
     }
@@ -147,6 +157,27 @@ const QRCodeGenerator: React.FC = () => {
         }
     };
 
+    // ── Phone sanitization ──
+    const sanitizePhone = (value: string): string => {
+        return value.replace(/[^\d\s\-+()]/g, "");
+    };
+
+    // ── Color contrast check ──
+    const hasLowContrast = (): boolean => {
+        const hexToLum = (hex: string): number => {
+            const r = parseInt(hex.slice(1, 3), 16) / 255;
+            const g = parseInt(hex.slice(3, 5), 16) / 255;
+            const b = parseInt(hex.slice(5, 7), 16) / 255;
+            const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+        };
+        if (qrColor.length !== 7 || bgColor.length !== 7) return false;
+        const l1 = hexToLum(qrColor);
+        const l2 = hexToLum(bgColor);
+        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        return ratio < 3;
+    };
+
     // ── Form validity ──
     const isFormValid = useCallback((): boolean => {
         switch (qrType) {
@@ -161,12 +192,18 @@ const QRCodeGenerator: React.FC = () => {
 
     // ── Generate branded QR ──
     const handleGenerate = async () => {
+        // Normalize URL if needed
+        let finalUrl = url;
         if (qrType === "url") {
             const v = validateURL(url);
             if (!v.valid) { setUrlError(v.error || "URL invalide"); return; }
+            if (v.normalized) {
+                finalUrl = v.normalized;
+                setUrl(finalUrl);
+            }
         }
 
-        const content = buildQRContent(qrType, { url, text, wifi, email, phone, sms });
+        const content = buildQRContent(qrType, { url: finalUrl, text, wifi, email, phone, sms });
         if (!content) {
             alert("Veuillez remplir les champs requis");
             return;
@@ -280,7 +317,7 @@ const QRCodeGenerator: React.FC = () => {
 
     // ── Download PNG or SVG ──
     const downloadQRCode = (format: "png" | "svg" = "png") => {
-        const fileName = `qrcode-${brandName.trim() || qrType}`;
+        const fileName = `qrcode-${(brandName.trim() || qrType).replace(/[^a-zA-Z0-9_-]/g, "_")}`;
 
         if (format === "svg") {
             const content = buildQRContent(qrType, { url, text, wifi, email, phone, sms });
@@ -298,7 +335,8 @@ const QRCodeGenerator: React.FC = () => {
                 link.download = `${fileName}.svg`;
                 link.href = href;
                 link.click();
-                URL.revokeObjectURL(href);
+                // Delay revoke to let browser start the download
+                setTimeout(() => URL.revokeObjectURL(href), 1000);
             });
             return;
         }
@@ -352,7 +390,7 @@ const QRCodeGenerator: React.FC = () => {
                                         <button
                                             key={t.id}
                                             className={`qr-type-card ${qrType === t.id ? "active" : ""}`}
-                                            onClick={() => { setQrType(t.id); setQrCodeDataUrl(null); }}
+                                            onClick={() => { setQrType(t.id); setQrCodeDataUrl(null); setUrlError(""); }}
                                             aria-label={t.label}
                                             title={t.desc}
                                         >
@@ -362,7 +400,7 @@ const QRCodeGenerator: React.FC = () => {
                                     ))}
                                 </div>
 
-                                <Form>
+                                <Form onSubmit={(e) => e.preventDefault()}>
                                     {/* ── URL ── */}
                                     {qrType === "url" && (
                                         <Form.Group className="mb-4">
@@ -503,7 +541,7 @@ const QRCodeGenerator: React.FC = () => {
                                                 type="tel"
                                                 placeholder="+243 82 881 2498"
                                                 value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
+                                                onChange={(e) => setPhone(sanitizePhone(e.target.value))}
                                             />
                                             <Form.Text className="text-muted">
                                                 Inclure l'indicatif pays (ex: +243)
@@ -522,7 +560,7 @@ const QRCodeGenerator: React.FC = () => {
                                                     type="tel"
                                                     placeholder="+243 82 881 2498"
                                                     value={sms.number}
-                                                    onChange={(e) => setSms((s) => ({ ...s, number: e.target.value }))}
+                                                    onChange={(e) => setSms((s) => ({ ...s, number: sanitizePhone(e.target.value) }))}
                                                 />
                                             </Form.Group>
                                             <Form.Group className="mb-4">
@@ -619,6 +657,11 @@ const QRCodeGenerator: React.FC = () => {
                                                 </Form.Group>
                                             </Col>
                                         </Row>
+                                        {hasLowContrast() && (
+                                            <p className="qr-contrast-warning">
+                                                Contraste trop faible — le QR code pourrait être difficile à scanner.
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* ── Generate Button ── */}

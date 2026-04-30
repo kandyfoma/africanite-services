@@ -29,7 +29,17 @@ const Footer = () => {
                         <h4>Outils</h4>
                         <ul>
                             <li><Link to="/qrcode">Générateur QR</Link></li>
-                            <li><Link to="/invoice">Générateur de Factures</Link></li>
+                            <li><Link to="/invoice">Factures</Link></li>
+                            <li><Link to="/receipt">Reçus</Link></li>
+                            <li><Link to="/cv">Générateur CV</Link></li>
+                            <li><Link to="/email-signature">Signature Email</Link></li>
+                            <li><Link to="/business-card">Carte de Visite</Link></li>
+                            <li><Link to="/currency">Devises</Link></li>
+                            <li><Link to="/loan">Prêt</Link></li>
+                            <li><Link to="/payroll">Paie</Link></li>
+                            <li><Link to="/password">Mot de Passe</Link></li>
+                            <li><Link to="/compress">Compresseur Image</Link></li>
+                            <li><Link to="/pdf">Éditeur PDF</Link></li>
                         </ul>
                     </div>
                     <div className="footer-col">

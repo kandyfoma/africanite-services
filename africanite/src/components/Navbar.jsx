@@ -21,6 +21,16 @@ const NavbarComponent = () => {
     const isOutilsActive = [
         "/qrcode",
         "/invoice",
+        "/currency",
+        "/password",
+        "/loan",
+        "/compress",
+        "/receipt",
+        "/email-signature",
+        "/cv",
+        "/business-card",
+        "/payroll",
+        "/pdf",
     ].includes(location.pathname);
 
     return (
@@ -104,6 +114,88 @@ const NavbarComponent = () => {
                                 active={location.pathname === "/invoice"}
                             >
                                 Générateur de Factures
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/receipt"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/receipt"}
+                            >
+                                Générateur de Reçu
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/cv"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/cv"}
+                            >
+                                Générateur de CV
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/email-signature"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/email-signature"}
+                            >
+                                Signature Email
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/business-card"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/business-card"}
+                            >
+                                Carte de Visite
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/currency"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/currency"}
+                            >
+                                Convertisseur de Devises
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/loan"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/loan"}
+                            >
+                                Calculateur de Prêt
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/payroll"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/payroll"}
+                            >
+                                Calculateur de Paie
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/password"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/password"}
+                            >
+                                Générateur de Mot de Passe
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/compress"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/compress"}
+                            >
+                                Compresseur d'Image
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                                as={Link}
+                                to="/pdf"
+                                onClick={handleNavClick}
+                                active={location.pathname === "/pdf"}
+                            >
+                                Éditeur de PDF
                             </NavDropdown.Item>
                         </NavDropdown>
                         <Nav.Link

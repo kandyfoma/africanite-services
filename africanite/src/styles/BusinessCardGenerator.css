@@ -1,0 +1,142 @@
+/* ── Business Card Generator ── */
+.bcard-page { padding: var(--space-section) 0; min-height: 80vh; background: var(--color-bg); }
+.bcard-page-title { font-size: var(--font-size-3xl); font-weight: 700; color: var(--color-text); text-align: center; margin-bottom: var(--space-xs); letter-spacing: -0.02em; }
+.bcard-page-subtitle { font-size: var(--font-size-base); color: var(--color-text-secondary); text-align: center; margin-bottom: var(--space-2xl); }
+
+.bcard-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    max-width: 920px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.bcard-form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+}
+.bcard-section-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+}
+.bcard-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+
+.bcard-input-group { margin-bottom: var(--space-md); }
+.bcard-input-group label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+}
+.bcard-input {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: var(--font-size-sm);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+.bcard-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+.bcard-style-group {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+.bcard-style-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.bcard-style-btn.active {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
+
+/* Preview card */
+.bcard-preview-wrapper {
+    position: sticky;
+    top: 100px;
+}
+.bcard-preview {
+    aspect-ratio: 3.5 / 2;
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: var(--space-lg);
+}
+.bcard-preview.dark { background: #1d1d1f; color: #fff; }
+.bcard-preview.light { background: #ffffff; color: #1d1d1f; border: 1px solid var(--color-border-light); }
+.bcard-preview.gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+
+.bcard-p-name { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.bcard-p-title { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+.bcard-p-company { font-size: 12px; font-weight: 600; margin-top: 8px; }
+.bcard-p-divider { width: 30px; height: 2px; margin: 10px 0; opacity: 0.3; }
+.bcard-p-contact { font-size: 10px; opacity: 0.65; line-height: 1.6; }
+.bcard-p-accent-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.bcard-back {
+    aspect-ratio: 3.5 / 2;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+.bcard-back.dark { background: #1d1d1f; color: #fff; }
+.bcard-back.light { background: #fff; color: #1d1d1f; border: 1px solid var(--color-border-light); }
+.bcard-back.gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+
+.bcard-dl-btn {
+    width: 100%;
+    padding: 0.65rem;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.bcard-dl-btn:hover { background: var(--color-accent-hover); }
+
+@media (max-width: 768px) {
+    .bcard-layout { grid-template-columns: 1fr; }
+    .bcard-preview-wrapper { position: static; }
+    .bcard-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .bcard-form-card { padding: var(--space-lg); }
+}

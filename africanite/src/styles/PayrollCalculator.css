@@ -1,0 +1,87 @@
+/* ── Payroll Calculator ── */
+.payroll-page { padding: var(--space-section) 0; min-height: 80vh; background: var(--color-bg); }
+.payroll-page-title { font-size: var(--font-size-3xl); font-weight: 700; color: var(--color-text); text-align: center; margin-bottom: var(--space-xs); letter-spacing: -0.02em; }
+.payroll-page-subtitle { font-size: var(--font-size-base); color: var(--color-text-secondary); text-align: center; margin-bottom: var(--space-2xl); }
+
+.payroll-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.payroll-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+}
+.payroll-card-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+.payroll-input-group { margin-bottom: var(--space-lg); }
+.payroll-input-group label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+}
+.payroll-input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-size: var(--font-size-sm);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+.payroll-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+.payroll-slider {
+    width: 100%;
+    accent-color: var(--color-accent);
+    margin-top: var(--space-xs);
+}
+
+.payroll-result-box {
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    text-align: center;
+    margin-bottom: var(--space-md);
+}
+.payroll-result-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+}
+.payroll-result-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+.payroll-breakdown { margin-top: var(--space-md); }
+.payroll-line {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-xs) 0;
+    font-size: var(--font-size-sm);
+    border-bottom: 1px solid var(--color-border-light);
+}
+.payroll-line:last-child { border-bottom: none; }
+.payroll-line-label { color: var(--color-text-secondary); }
+.payroll-line-value { font-weight: 600; color: var(--color-text); }
+.payroll-line.deduction .payroll-line-value { color: var(--color-error); }
+.payroll-line.total { border-top: 2px solid var(--color-border); border-bottom: none; padding-top: var(--space-sm); }
+.payroll-line.total .payroll-line-label { font-weight: 700; color: var(--color-text); }
+.payroll-line.total .payroll-line-value { font-weight: 700; color: var(--color-success); font-size: var(--font-size-base); }
+
+@media (max-width: 768px) { .payroll-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .payroll-card { padding: var(--space-lg); } .payroll-result-value { font-size: var(--font-size-xl); } }

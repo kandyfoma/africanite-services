@@ -1,0 +1,134 @@
+/* ── Image Compressor ── */
+.compressor-page { padding: var(--space-section) 0; min-height: 80vh; background: var(--color-bg); }
+.compressor-page-title { font-size: var(--font-size-3xl); font-weight: 700; color: var(--color-text); text-align: center; margin-bottom: var(--space-xs); letter-spacing: -0.02em; }
+.compressor-page-subtitle { font-size: var(--font-size-base); color: var(--color-text-secondary); text-align: center; margin-bottom: var(--space-2xl); }
+
+.compressor-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.compressor-dropzone {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: var(--color-surface-secondary);
+}
+.compressor-dropzone:hover, .compressor-dropzone.dragging {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+.compressor-dropzone-icon { color: var(--color-text-tertiary); margin-bottom: var(--space-sm); }
+.compressor-dropzone-text { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.compressor-dropzone-hint { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-top: 0.25rem; }
+
+.compressor-controls { margin-top: var(--space-lg); }
+.compressor-controls label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xs);
+}
+.compressor-slider {
+    width: 100%;
+    accent-color: var(--color-accent);
+    margin-bottom: var(--space-md);
+}
+
+.compressor-format-group {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+.compressor-format-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.compressor-format-btn.active {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
+
+.compressor-preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+}
+.compressor-preview-card {
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+}
+.compressor-preview-card img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius-sm);
+    object-fit: contain;
+    margin-bottom: var(--space-sm);
+}
+.compressor-preview-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+}
+.compressor-preview-size {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.compressor-savings {
+    text-align: center;
+    margin: var(--space-lg) 0;
+    padding: var(--space-md);
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-md);
+}
+.compressor-savings-pct {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-success);
+}
+.compressor-savings-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.compressor-download-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #fff;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.compressor-download-btn:hover { background: var(--color-accent-hover); }
+
+@media (max-width: 576px) {
+    .compressor-card { padding: var(--space-lg); }
+    .compressor-preview-grid { grid-template-columns: 1fr; }
+}

@@ -14,6 +14,16 @@ const HKManagementSystem = lazy(() => import("./components/HKManagementSystem"))
 const WennzePage = lazy(() => import("./components/WennzePage"));
 const GoShopperPage = lazy(() => import("./components/GoShopperPage"));
 const InvoiceGenerator = lazy(() => import("./components/InvoiceGenerator"));
+const CurrencyConverter = lazy(() => import("./components/CurrencyConverter"));
+const PasswordGenerator = lazy(() => import("./components/PasswordGenerator"));
+const LoanCalculator = lazy(() => import("./components/LoanCalculator"));
+const ImageCompressor = lazy(() => import("./components/ImageCompressor"));
+const ReceiptGenerator = lazy(() => import("./components/ReceiptGenerator"));
+const EmailSignatureGenerator = lazy(() => import("./components/EmailSignatureGenerator"));
+const CVGenerator = lazy(() => import("./components/CVGenerator"));
+const BusinessCardGenerator = lazy(() => import("./components/BusinessCardGenerator"));
+const PayrollCalculator = lazy(() => import("./components/PayrollCalculator"));
+const PDFEditor = lazy(() => import("./components/PDFEditor"));
 const PrivacyPolicy = lazy(() => import("./components/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./components/TermsOfService"));
 const NotFound = lazy(() => import("./components/NotFound"));
@@ -61,6 +71,16 @@ const App: React.FC = () => {
                             <Route path="/goshopper" element={<GoShopperPage />} />
                             <Route path="/qrcode" element={<QRCode />} />
                             <Route path="/invoice" element={<InvoiceGenerator />} />
+                            <Route path="/currency" element={<CurrencyConverter />} />
+                            <Route path="/password" element={<PasswordGenerator />} />
+                            <Route path="/loan" element={<LoanCalculator />} />
+                            <Route path="/compress" element={<ImageCompressor />} />
+                            <Route path="/receipt" element={<ReceiptGenerator />} />
+                            <Route path="/email-signature" element={<EmailSignatureGenerator />} />
+                            <Route path="/cv" element={<CVGenerator />} />
+                            <Route path="/business-card" element={<BusinessCardGenerator />} />
+                            <Route path="/payroll" element={<PayrollCalculator />} />
+                            <Route path="/pdf" element={<PDFEditor />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </Suspense>
